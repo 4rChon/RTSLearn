@@ -3,7 +3,7 @@
 #include <TypeDefs.h>
 
 struct PlayerInput {
-	const int player_id;
-	const ActionType type;
-	const Vec2i target;
+    const int player_id;
+    const ActionType type;
+    const Vec2i target;
 };

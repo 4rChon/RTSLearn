@@ -7,8 +7,8 @@
 #include <memory>
 
 namespace Gym {
-	class Agent {
-	public:
-		const PlayerInput& get_action(std::weak_ptr<Observation> obs) const;
-	};
+    class Agent {
+    public:
+        const PlayerInput& get_action(std::weak_ptr<Observation> obs) const;
+    };
 }

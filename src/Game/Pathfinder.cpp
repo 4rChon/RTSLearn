@@ -21,8 +21,8 @@ std::vector<Vec2i> Pathfinder::get_path(const Vec2i& start, const Vec2i& end, st
     while (!open_pq.empty()) {
         auto current = open_pq.top().second;
         if (current == end) {
-			return reconstruct_path(came_from, current);
-		}
+            return reconstruct_path(came_from, current);
+        }
         open_pq.pop();
         open_set[current] = false;
 
@@ -38,8 +38,8 @@ std::vector<Vec2i> Pathfinder::get_path(const Vec2i& start, const Vec2i& end, st
             auto neighbour = neighbours[i];
             // check if neighbour is within map bounds
             if (neighbour.first < 0 || neighbour.first >= map_width || neighbour.second < 0 || neighbour.second >= map_height || map[neighbour.first][neighbour.second] == 0) {
-				continue;
-			}
+                continue;
+            }
 
             auto tentative_g_score = g_score[current] + map[current.first][current.second];
             if (g_score.contains(neighbour) && tentative_g_score >= g_score[neighbour]) {
@@ -51,8 +51,8 @@ std::vector<Vec2i> Pathfinder::get_path(const Vec2i& start, const Vec2i& end, st
             if (open_set.contains(neighbour) || open_set[neighbour]) {
                 continue;
             }
-			open_pq.push({ f_score[neighbour], neighbour });
-			open_set[neighbour] = true;
+            open_pq.push({ f_score[neighbour], neighbour });
+            open_set[neighbour] = true;
         }
     }
 
@@ -68,8 +68,8 @@ std::vector<Vec2i> Pathfinder::reconstruct_path(std::unordered_map<Vec2i, Vec2i>
     std::vector<Vec2i> total_path { current };
 
     while (came_from.find(current) != came_from.end()) {
-		current = came_from[current];
-		total_path.push_back(current);
+        current = came_from[current];
+        total_path.push_back(current);
     }
 
     return total_path;

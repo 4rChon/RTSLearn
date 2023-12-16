@@ -5,8 +5,8 @@
 #include <memory>
 
 Action::Action(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
-	: target(target)
-	, actor(actor)
-	, player(player)
-	, game(game) {
+    : target(target)
+    , actor(actor)
+    , player(player)
+    , game(game) {
 }

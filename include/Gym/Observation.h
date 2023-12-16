@@ -1,4 +1,4 @@
 #pragma once
 namespace Gym {
-	struct Observation {};
+    struct Observation {};
 }

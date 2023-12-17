@@ -1,5 +1,5 @@
 constexpr auto MAX_STEPS = 1000000;
-constexpr auto MAX_EPISODES = 10;
+constexpr auto MAX_EPISODES = 1;
 
 #include <Gym/Environment.h>
 #include <chrono>
@@ -8,7 +8,7 @@ constexpr auto MAX_EPISODES = 10;
 using namespace Gym;
 
 int main() {
-    Environment env({ RenderMode::None, 60, 2, MAX_STEPS });
+    Environment env({ RenderMode::Human, 30, 2, MAX_STEPS });
     std::shared_ptr<Observation> obs;
     std::shared_ptr<Observation> next_obs;
     double reward;

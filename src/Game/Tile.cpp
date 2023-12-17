@@ -39,7 +39,8 @@ std::string Tile::get_sprite() const {
     ss << Constants::tile_sprite.at(type);
     if (auto unit_ptr = unit.lock()) {
         ss << unit_ptr->get_sprite();
-    } else {
+    }
+    else {
         ss << "  ";
     }
 
@@ -48,6 +49,12 @@ std::string Tile::get_sprite() const {
 
 void Tile::set_minerals(int minerals) {
     this->minerals = minerals;
+
+    if (this->minerals <= 0 && type == TileType::Mine) {
+        type = TileType::Grass;
+    } else if (this->minerals > 0 && type == TileType::Grass) {
+        type = TileType::Mine;
+    }
 }
 
 void Tile::set_pathable(bool pathable) {

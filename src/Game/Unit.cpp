@@ -40,6 +40,7 @@ UnitType Unit::get_type() const {
 
 const std::string Unit::get_sprite() const {
     std::stringstream ss;
+    // auto action_sprite = action_queue.empty() ? '.' : action_queue.front()->get_action_sprite();
     ss << "\x1b[1;3" << owner+1 << "m." << Constants::unit_sprite.at(type) << "\x1b[m";
 
     return ss.str();
@@ -67,6 +68,7 @@ void Unit::act() {
             action_queue.pop();
             break;
         case ActionResult::Failure:
+            action->cancel();
             action_queue.pop();
             break;
         case ActionResult::Running:
@@ -77,9 +79,17 @@ void Unit::act() {
 std::vector<ActionType> Unit::get_available_actions() const {
     switch (type) {
         case UnitType::Worker:
-            return { ActionType::Noop, ActionType::Click, ActionType::BuildTownHall };
+            return { ActionType::Noop, ActionType::Click, ActionType::BuildTownHall, ActionType::BuildFarm, ActionType::BuildBarracks };
         case UnitType::TownHall:
             return { ActionType::Noop, ActionType::Click, ActionType::TrainWorker };
+        case UnitType::Barracks:
+            return { ActionType::Noop, ActionType::Click, ActionType::TrainMeleeWarrior, ActionType::TrainRangedWarrior };
+        case UnitType::Farm:
+            return { ActionType::Noop, ActionType::Click };
+        case UnitType::MeleeWarrior:
+            return { ActionType::Noop, ActionType::Click };
+        case UnitType::RangedWarrior:
+            return { ActionType::Noop, ActionType::Click };
         default:
             return { ActionType::Noop, ActionType::Click };
     }

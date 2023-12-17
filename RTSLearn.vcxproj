@@ -135,11 +135,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Game\Actions\Mine.cpp" />
+    <ClCompile Include="src\Game\Actions\Build.cpp" />
+    <ClCompile Include="src\Game\Actions\Gather.cpp" />
     <ClCompile Include="src\Game\Pathfinder.cpp" />
     <ClCompile Include="src\Game\Actions\Move.cpp" />
     <ClCompile Include="src\Game\Player.cpp" />
-    <ClCompile Include="src\Game\Actions\TrainWorker.cpp" />
+    <ClCompile Include="src\Game\Actions\Train.cpp" />
     <ClCompile Include="src\Game\Actions\Action.cpp" />
     <ClCompile Include="src\Game\Actions\Noop.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
@@ -151,11 +152,13 @@
     <ClCompile Include="src\Game\Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Game\AbilityType.h" />
     <ClInclude Include="include\Game\Actions\ActionResult.h" />
-    <ClInclude Include="include\Game\Actions\Mine.h" />
+    <ClInclude Include="include\Game\Actions\Build.h" />
+    <ClInclude Include="include\Game\Actions\Gather.h" />
     <ClInclude Include="include\Game\Actions\Move.h" />
     <ClInclude Include="include\Game\Actions\Noop.h" />
-    <ClInclude Include="include\Game\Actions\TrainWorker.h" />
+    <ClInclude Include="include\Game\Actions\Train.h" />
     <ClInclude Include="include\Game\ActionType.h" />
     <ClInclude Include="include\Game\Constants.h" />
     <ClInclude Include="include\Game\Actions\Action.h" />

@@ -7,3 +7,7 @@ Noop::Noop(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player>
 ActionResult Noop::act() { return ActionResult::Success; }
 
 void Noop::cancel() { /* Do nothing */ }
+
+char Noop::get_action_sprite() const {
+    return '.';
+}

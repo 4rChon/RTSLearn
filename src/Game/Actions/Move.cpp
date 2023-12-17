@@ -16,8 +16,8 @@ ActionResult Move::act() {
         return ActionResult::Success;
     }
 
+    move_cooldown++;
     if (move_cooldown < Constants::unit_move_cooldown.at(unit->get_type())) {
-        move_cooldown++;
         return ActionResult::Running;
     } else {
         move_cooldown = 0;
@@ -52,4 +52,8 @@ ActionResult Move::act() {
 void Move::cancel() {
     path_index = 0;
     path = {};
+}
+
+char Move::get_action_sprite() const {
+    return 'm';
 }

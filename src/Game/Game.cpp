@@ -4,9 +4,11 @@
 #include <Game/Tile.h>
 #include <Game/Unit.h>
 #include <Game/UnitType.h>
-#include <Game/Actions/TrainWorker.h>
+#include <Game/Actions/Train.h>
 #include <Game/Actions/Noop.h>
 #include <Game/Actions/Move.h>
+#include <Game/Actions/Gather.h>
+#include <Game/Actions/Build.h>
 #include <TypeDefs.h>
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -27,10 +29,9 @@ void Game::step() {
         const PlayerInput& input = input_buffer.top();
         input_buffer.pop();
 
-        auto &player = players[input.player_id];
+        auto player = players[input.player_id];
         auto game = std::weak_ptr<Game>(shared_from_this());
         auto selected_unit_id = player->get_selected_unit_id();
-        std::shared_ptr<Action> action;
         switch (input.type) {
             case ActionType::Noop:
                 break;
@@ -61,13 +62,20 @@ void Game::step() {
 
                 // if the target is a pathable tile, check if we have a unit selected, if so, move to it
                 if (tile->is_pathable()) {
-                    auto unit_id = player->get_selected_unit_id();
-                    if (unit_id < 0) {
+                    if (selected_unit_id < 0) {
                         break;
                     }
 
-                    auto& unit = units[unit_id];
-                    if (Constants::unit_move_cooldown.at(unit->get_type()) > 0) {
+                    if (!units.contains(selected_unit_id)) {
+                        break;
+                    }
+
+                    auto& unit = units[selected_unit_id];
+                    auto& unit_abilities = Constants::unit_abilities.at(unit->get_type());
+                    if (unit_abilities.contains(AbilityType::Gather) && tile->get_type() == TileType::Mine) {
+                        auto action = std::make_unique<Gather>(input.target, unit, player, game);
+                        unit->enqueue_action(std::move(action), true);
+                    } else if (unit_abilities.contains(AbilityType::Move)) {
                         auto action = std::make_unique<Move>(Move(input.target, unit, player, game));
                         unit->enqueue_action(std::move(action), true);
                     }
@@ -76,32 +84,27 @@ void Game::step() {
                 break;
             }
             case ActionType::TrainWorker: {
-                if (selected_unit_id < 0) {
-                    break;
-                }
-
-                if (units.find(selected_unit_id) == units.end()) {
-                    break;
-                }
-
-                auto& unit = units[selected_unit_id];
-                auto action = std::make_unique<TrainWorker>(TrainWorker(input.target, unit, player, game));
-                unit->enqueue_action(std::move(action), true);
+                train(input, player, game, selected_unit_id, UnitType::Worker);
                 break;
             }
             case ActionType::TrainMeleeWarrior: {
+                train(input, player, game, selected_unit_id, UnitType::MeleeWarrior);
                 break;
             }
             case ActionType::TrainRangedWarrior: {
+                train(input, player, game, selected_unit_id, UnitType::RangedWarrior);
                 break;
             }
             case ActionType::BuildFarm: {
+                build(input, player, game, selected_unit_id, UnitType::Farm);
                 break;
             }
             case ActionType::BuildBarracks: {
+                build(input, player, game, selected_unit_id, UnitType::Barracks);
                 break;
             }
             case ActionType::BuildTownHall: {
+                build(input, player, game, selected_unit_id, UnitType::TownHall);
                 break;
             }
         }
@@ -187,6 +190,40 @@ void Game::init_player(int player_id, const Vec2i& starting_location) {
     players.push_back(player);
 
     create_unit(UnitType::TownHall, starting_location, player_id);
+}
+
+void Game::train(const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game, int selected_unit_id, UnitType unit_type) {
+    if (selected_unit_id < 0) {
+        return;
+    }
+
+    if (!units.contains(selected_unit_id)) {
+        return;
+    }
+
+    auto& unit = units[selected_unit_id];
+    auto& unit_abilities = Constants::unit_abilities.at(unit->get_type());
+    if (unit_abilities.contains((AbilityType)input.type)) {
+        auto action = std::make_unique<Train>(Train(input.target, unit, player, game, unit_type));
+        unit->enqueue_action(std::move(action), true);
+    }
+}
+
+void Game::build(const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game, int selected_unit_id, UnitType unit_type) {
+    if (selected_unit_id < 0) {
+        return;
+    }
+
+    if (!units.contains(selected_unit_id)) {
+        return;
+    }
+
+    auto& unit = units[selected_unit_id];
+    auto& unit_abilities = Constants::unit_abilities.at(unit->get_type());
+    if (unit_abilities.contains((AbilityType)input.type)) {
+        auto action = std::make_unique<Build>(input.target, unit, player, game, unit_type);
+        unit->enqueue_action(std::move(action), true);
+    }
 }
 
 void Game::create_unit(UnitType unit_type, const Vec2i& position, int player_id) {

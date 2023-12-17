@@ -1,12 +1,29 @@
 #pragma once
 #include <Game/TileType.h>
 #include <Game/UnitType.h>
+#include <Game/AbilityType.h>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 
 namespace Constants {
     static const int INITIAL_TILE_MINERALS = 1000;
     static const int INITIAL_PLAYER_MINERALS = 100;
+
+    static const std::unordered_map<UnitType, std::unordered_set<AbilityType>> unit_abilities = {
+        { UnitType::Worker, {
+            AbilityType::Move,
+            AbilityType::Gather,
+            AbilityType::BuildTownHall,
+            AbilityType::BuildFarm,
+            AbilityType::BuildBarracks
+        } },
+        { UnitType::RangedWarrior, { AbilityType::Move, AbilityType::Attack } },
+        { UnitType::MeleeWarrior, { AbilityType::Move, AbilityType::Attack } },
+        { UnitType::TownHall, { AbilityType::TrainWorker } },
+        { UnitType::Barracks, { AbilityType::TrainRangedWarrior, AbilityType::TrainMeleeWarrior } },
+        { UnitType::Farm, { } }
+    };
 
     static const std::unordered_map<TileType, const std::string> tile_sprite = {
         { TileType::Grass, "\x1b[42m" },

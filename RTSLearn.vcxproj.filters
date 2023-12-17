@@ -42,7 +42,7 @@
     <ClCompile Include="src\Game\Actions\Noop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Actions\TrainWorker.cpp">
+    <ClCompile Include="src\Game\Actions\Train.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Player.cpp">
@@ -54,7 +54,10 @@
     <ClCompile Include="src\Game\Pathfinder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Actions\Mine.cpp">
+    <ClCompile Include="src\Game\Actions\Gather.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Actions\Build.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,7 +119,7 @@
     <ClInclude Include="include\Game\Actions\Noop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Game\Actions\TrainWorker.h">
+    <ClInclude Include="include\Game\Actions\Train.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Game\Actions\ActionResult.h">
@@ -128,7 +131,13 @@
     <ClInclude Include="include\Game\Pathfinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Game\Actions\Mine.h">
+    <ClInclude Include="include\Game\Actions\Gather.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\AbilityType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\Actions\Build.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

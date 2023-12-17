@@ -37,4 +37,6 @@ private:
     std::unordered_map<int, std::shared_ptr<Unit>> units;
 
     void init_player(int player_id, const Vec2i& starting_location);
+    void train(const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game, int selected_unit_id, UnitType unit_type);
+    void build(const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game, int selected_unit_id, UnitType unit_type);
 };

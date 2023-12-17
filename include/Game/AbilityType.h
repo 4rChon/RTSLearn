@@ -1,5 +1,5 @@
 #pragma once
-enum class ActionType {
+enum class AbilityType {
     Noop = 0,
     BuildTownHall,
     BuildBarracks,
@@ -7,5 +7,7 @@ enum class ActionType {
     TrainWorker,
     TrainMeleeWarrior,
     TrainRangedWarrior,
-    Click,
+    Gather,
+    Attack,
+    Move,
 };

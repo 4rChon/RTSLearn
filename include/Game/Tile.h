@@ -33,7 +33,7 @@ public:
             case '~':
                 return std::make_shared<Tile>(position, TileType::Water, false, 0);
             case 'X':
-                return std::make_shared<Tile>(position, TileType::Mine, false, Constants::INITIAL_TILE_MINERALS);
+                return std::make_shared<Tile>(position, TileType::Mine, true, Constants::INITIAL_TILE_MINERALS);
             case 'O':
                 return std::make_shared<Tile>(position, TileType::Grass, true, 0);
             default:

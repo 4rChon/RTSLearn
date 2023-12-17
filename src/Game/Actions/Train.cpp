@@ -37,7 +37,7 @@ ActionResult Train::act() {
         player->modify_supply(supply_cost);
     }
 
-    progress++;
+    ++progress;
     if (progress < target_progress) {
         return ActionResult::Running;
     }

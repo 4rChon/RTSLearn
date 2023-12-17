@@ -29,7 +29,7 @@ void Game::step() {
         const PlayerInput& input = input_buffer.top();
         input_buffer.pop();
 
-        auto player = players[input.player_id];
+        auto& player = players[input.player_id];
         auto game = std::weak_ptr<Game>(shared_from_this());
         auto selected_unit_id = player->get_selected_unit_id();
         switch (input.type) {
@@ -75,11 +75,16 @@ void Game::step() {
                     if (unit_abilities.contains(AbilityType::Gather) && tile->get_type() == TileType::Mine) {
                         auto action = std::make_unique<Gather>(input.target, unit, player, game);
                         unit->enqueue_action(std::move(action), true);
-                    } else if (unit_abilities.contains(AbilityType::Move)) {
+
+                        break;
+                    }
+
+                    if (unit_abilities.contains(AbilityType::Move)) {
                         auto action = std::make_unique<Move>(Move(input.target, unit, player, game));
                         unit->enqueue_action(std::move(action), true);
+
+                        break;
                     }
-                    break;
                 }
                 break;
             }
@@ -114,7 +119,7 @@ void Game::step() {
         unit_kv.second->act();
     }
 
-    ticks++;
+    ++ticks;
 }
 
 void Game::render() {

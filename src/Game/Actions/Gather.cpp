@@ -3,8 +3,8 @@
 
 Gather::Gather(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
     : Action(target, actor, player, game, 'g')
-    , gather_max_progress(5)
-    , gather_progress(0) {
+    , target_progress(5)
+    , progress(0) {
 }
 
 ActionResult Gather::act() {
@@ -29,14 +29,14 @@ ActionResult Gather::act() {
         }
     }
 
-    gather_progress++;
-    if (gather_progress < gather_max_progress) {
+    ++progress;
+    if (progress < target_progress) {
         return ActionResult::Running;
     }
 
     if (auto player = this->player.lock()) {
         player->modify_minerals(10);
-        gather_progress = 0;
+        progress = 0;
         tile->set_minerals(tile->get_minerals() - 10);
 
         unit->enqueue_action(std::make_unique<Gather>(target, actor, player, game), false);
@@ -50,7 +50,7 @@ void Gather::cancel() {
     if (move_action) {
         move_action->cancel();
     }
-    gather_progress = 0;
+    progress = 0;
 }
 
 

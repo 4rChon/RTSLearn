@@ -9,15 +9,14 @@
 #include <sstream>
 #include <mutex>
 
-int Unit::next_id = 0;
+int Unit::next_id = -1;
 
 Unit::Unit(UnitType type, const Vec2i& position, int owner)
     : type(type)
     , position(position)
     , owner(owner)
-    , id(next_id++) {
-    health = Constants::unit_health.at(type);
-}
+    , id(++next_id)
+    , health(Constants::unit_health.at(type)) {}
 
 void Unit::set_position(const Vec2i& position) {
     this->position = position;

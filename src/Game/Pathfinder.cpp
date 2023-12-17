@@ -18,6 +18,7 @@ std::vector<Vec2i> Pathfinder::get_path(const Vec2i& start, const Vec2i& end, st
     std::unordered_map<Vec2i, int> g_score{ { start, 0 } };
     std::unordered_map<Vec2i, int> f_score{ { start, heuristic(start, end) } };
 
+
     while (!open_pq.empty()) {
         auto current = open_pq.top().second;
         if (current == end) {
@@ -34,9 +35,8 @@ std::vector<Vec2i> Pathfinder::get_path(const Vec2i& start, const Vec2i& end, st
         neighbours[2] = { x, y - 1 };
         neighbours[3] = { x, y + 1 };
         
-        for (auto i = 0; i < 4; i++) {
+        for (auto i = 0; i < 4; ++i) {
             auto neighbour = neighbours[i];
-            // check if neighbour is within map bounds
             if (neighbour.first < 0 || neighbour.first >= map_width || neighbour.second < 0 || neighbour.second >= map_height || map[neighbour.first][neighbour.second] == 0) {
                 continue;
             }
@@ -56,15 +56,14 @@ std::vector<Vec2i> Pathfinder::get_path(const Vec2i& start, const Vec2i& end, st
         }
     }
 
-    return std::vector<Vec2i>();
+    return {};
 }
 
 int Pathfinder::heuristic(const Vec2i& a, const Vec2i& b) {
     return std::abs(a.first - b.first) + std::abs(a.second - b.second);
 }
 
-std::vector<Vec2i> Pathfinder::reconstruct_path(std::unordered_map<Vec2i, Vec2i> came_from, Vec2i current)
-{
+std::vector<Vec2i> Pathfinder::reconstruct_path(std::unordered_map<Vec2i, Vec2i> came_from, Vec2i current) {
     std::vector<Vec2i> total_path { current };
 
     while (came_from.find(current) != came_from.end()) {

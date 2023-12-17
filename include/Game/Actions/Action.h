@@ -14,6 +14,7 @@ class Game;
 class Action {
 public:
     Action(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, char sprite);
+    virtual ~Action() = default;
     virtual ActionResult act() = 0;
     virtual void cancel() = 0;
     char get_sprite() const;

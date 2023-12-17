@@ -10,6 +10,6 @@ public:
     void cancel() override;
 private:
     std::unique_ptr<Move> move_action;
-    int gather_max_progress;
-    int gather_progress;
+    int progress;
+    int target_progress;
 };

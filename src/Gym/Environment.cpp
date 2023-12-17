@@ -61,7 +61,7 @@ namespace Gym {
 
         game->step();
 
-        tick++;
+        ++tick;
 
         if (metadata.render_mode == RenderMode::Human) {
             render_flag = true;

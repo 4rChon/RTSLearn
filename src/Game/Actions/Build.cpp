@@ -43,7 +43,7 @@ ActionResult Build::act() {
         }
     }
 
-    progress++;
+    ++progress;
     if (progress < target_progress) {
         return ActionResult::Running;
     }

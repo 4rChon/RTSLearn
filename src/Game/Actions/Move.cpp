@@ -3,7 +3,8 @@
 
 Move::Move(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
     : Action(target, actor, player, game, 'm')
-    , move_cooldown(0) {
+    , move_cooldown(0)
+    , path_index(0) {
 }
 
 ActionResult Move::act() {
@@ -16,7 +17,7 @@ ActionResult Move::act() {
         return ActionResult::Success;
     }
 
-    move_cooldown++;
+    ++move_cooldown;
     if (move_cooldown < Constants::unit_move_cooldown.at(unit->get_type())) {
         return ActionResult::Running;
     } else {
@@ -42,7 +43,7 @@ ActionResult Move::act() {
         return ActionResult::Failure;
     }
 
-    if (!game->move_unit(unit, path[path.size() - (2 + path_index++)])) {
+    if (!game->move_unit(unit, path[path.size() - (1 + ++path_index)])) {
         path_index = 0;
     }
 
@@ -51,5 +52,5 @@ ActionResult Move::act() {
 
 void Move::cancel() {
     path_index = 0;
-    path = {};
+    path.clear();
 }

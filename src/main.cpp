@@ -1,5 +1,5 @@
 constexpr auto MAX_STEPS = 1000000;
-constexpr auto MAX_EPISODES = 1;
+constexpr auto MAX_EPISODES = 10;
 
 #include <Gym/Environment.h>
 #include <chrono>
@@ -17,9 +17,8 @@ int main() {
     std::shared_ptr<Info> info;
     bool done = false;
 
-    for (int episode = 0; episode < MAX_EPISODES; episode++)
+    for (int episode = 0; episode < MAX_EPISODES; ++episode)
     {
-
         std::tie(obs, info) = env.reset("assets/map.json");
         done = false;
 

@@ -2,7 +2,7 @@
 #include <Game/Constants.h>
 
 Build::Build(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, UnitType unit_type)
-    : Action(target, actor, player, game)
+    : Action(target, actor, player, game, Constants::unit_create_sprite.at(unit_type))
     , unit_type(unit_type)
     , started(false)
     , progress(0)
@@ -74,17 +74,4 @@ void Build::cancel() {
     }
 
     progress = 0;
-}
-
-char Build::get_action_sprite() const {
-    switch (unit_type) {
-        case UnitType::TownHall:
-            return 't';
-        case UnitType::Farm:
-            return 'f';
-        case UnitType::Barracks:
-            return 'b';
-        default:
-            return '?';
-    }
 }

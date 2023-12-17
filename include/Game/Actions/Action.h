@@ -13,11 +13,12 @@ class Game;
 
 class Action {
 public:
-    Action(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game);
+    Action(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, char sprite);
     virtual ActionResult act() = 0;
     virtual void cancel() = 0;
-    virtual char get_action_sprite() const = 0;
+    char get_sprite() const;
 protected:
+    char sprite;
     const Vec2i target;
     std::weak_ptr<Unit> actor;
     std::weak_ptr<Player> player;

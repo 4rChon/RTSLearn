@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <sstream>
+#include <mutex>
 
 int Unit::next_id = 0;
 
@@ -38,15 +39,16 @@ UnitType Unit::get_type() const {
     return type;
 }
 
-const std::string Unit::get_sprite() const {
+const std::string Unit::get_sprite() {
+    std::lock_guard<std::mutex> guard(action_queue_lock);
+    auto action_sprite = action_queue.empty() ? '.' : action_queue.front()->get_sprite();
     std::stringstream ss;
-    // auto action_sprite = action_queue.empty() ? '.' : action_queue.front()->get_action_sprite();
-    ss << "\x1b[1;3" << owner+1 << "m." << Constants::unit_sprite.at(type) << "\x1b[m";
-
+    ss << "\x1b[1;3" << owner + 1 << "m" << action_sprite << Constants::unit_sprite.at(type) << "\x1b[m";
     return ss.str();
 }
 
 void Unit::enqueue_action(std::unique_ptr<Action> player_input, bool replace_current_action) {
+    std::lock_guard<std::mutex> guard(action_queue_lock);
     if (replace_current_action && !action_queue.empty()) {
         action_queue.front()->cancel();
         action_queue.pop();
@@ -64,15 +66,20 @@ void Unit::act() {
     auto result = action->act();
 
     switch (result) {
-        case ActionResult::Success:
+        case ActionResult::Success: {
+            std::lock_guard<std::mutex> guard(action_queue_lock);
             action_queue.pop();
             break;
-        case ActionResult::Failure:
+        }
+        case ActionResult::Failure: {
             action->cancel();
+            std::lock_guard<std::mutex> guard(action_queue_lock);
             action_queue.pop();
             break;
-        case ActionResult::Running:
+        }
+        case ActionResult::Running: {
             break;
+        }
     }
 }
 

@@ -50,6 +50,15 @@ namespace Constants {
         { UnitType::Farm, 'F' }
     };
 
+    static const std::unordered_map<UnitType, char> unit_create_sprite = {
+        { UnitType::Worker, 'w' },
+        { UnitType::RangedWarrior, 'r' },
+        { UnitType::MeleeWarrior, 'm' },
+        { UnitType::TownHall, 't' },
+        { UnitType::Barracks, 'b' },
+        { UnitType::Farm, 'f' }
+    };
+
     static const std::unordered_map<UnitType, int> unit_health = {
         { UnitType::Worker, 10 },
         { UnitType::RangedWarrior, 10 },

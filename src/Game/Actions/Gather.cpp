@@ -2,7 +2,7 @@
 #include <Game/Actions/Move.h>
 
 Gather::Gather(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
-    : Action(target, actor, player, game)
+    : Action(target, actor, player, game, 'g')
     , gather_max_progress(5)
     , gather_progress(0) {
 }
@@ -51,10 +51,6 @@ void Gather::cancel() {
         move_action->cancel();
     }
     gather_progress = 0;
-}
-
-char Gather::get_action_sprite() const {
-    return 'g';
 }
 
 

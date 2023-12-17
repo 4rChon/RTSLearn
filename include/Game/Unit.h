@@ -25,8 +25,9 @@ public:
     void enqueue_action(std::unique_ptr<Action> player_input, bool replace_current_action);
     void act();
     std::vector<ActionType> get_available_actions() const;
+    bool modify_health(int amount);
+    bool is_alive() const;
 private:
-    std::string sprite;
     static int next_id;
     const int id;
     const int owner;

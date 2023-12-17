@@ -4,22 +4,23 @@
 #include <Game/Tile.h>
 #include <sstream>
 
-Tile::Tile(Vec2i position, TileType type, bool pathable, int minerals) 
+Tile::Tile(Vec2i position, TileType type) 
     : position(position)
     , type(type)
-    , pathable(pathable)
-    , minerals(minerals) {}
+    , pathable(Constants::tile_pathable.at(type))
+    , blocks_vision(Constants::tile_blocks_vision.at(type))
+    , minerals(type == TileType::Mine ? Constants::INITIAL_TILE_MINERALS : 0) {}
 
 TileType Tile::get_type() const {
     return type;
 }
 
 bool Tile::is_pathable(bool ignore_unit) const {
-    if (!ignore_unit && !unit.expired()) {
-        return false;
-    }
+    return (ignore_unit || unit.expired()) && pathable;
+}
 
-    return pathable;
+bool Tile::is_vision_blocker() const {
+    return blocks_vision;
 }
 
 int Tile::get_minerals() const {

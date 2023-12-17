@@ -4,4 +4,5 @@ enum class TileType {
     Grass = 1,
     Water = 2,
     Mine = 3,
+    Wall = 4
 };

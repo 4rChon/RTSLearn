@@ -42,7 +42,7 @@ const std::string Unit::get_sprite() {
     std::lock_guard<std::mutex> guard(action_queue_lock);
     auto action_sprite = action_queue.empty() ? '.' : action_queue.front()->get_sprite();
     std::stringstream ss;
-    ss << "\x1b[1;3" << owner + 1 << "m" << action_sprite << Constants::unit_sprite.at(type) << "\x1b[m";
+    ss << "\x1b[1;3" << owner + 5 << "m" << action_sprite << Constants::unit_sprite.at(type) << "\x1b[m";
     return ss.str();
 }
 
@@ -99,4 +99,14 @@ std::vector<ActionType> Unit::get_available_actions() const {
         default:
             return { ActionType::Noop, ActionType::Click };
     }
+}
+
+bool Unit::modify_health(int amount) {
+    health += amount;
+
+    return is_alive();
+}
+
+bool Unit::is_alive() const {
+    return health > 0;
 }

@@ -25,11 +25,37 @@ namespace Constants {
         { UnitType::Farm, { } }
     };
 
+    static const std::unordered_map<TileType, bool> tile_pathable = {
+        { TileType::Grass, true },
+        { TileType::Water, false },
+        { TileType::Mine, true },
+        { TileType::Wall, false },
+        { TileType::None, false }
+    };
+
+    static const std::unordered_map<TileType, bool> tile_blocks_vision = {
+        { TileType::Grass, false },
+        { TileType::Water, false },
+        { TileType::Mine, false },
+        { TileType::Wall, true },
+        { TileType::None, false }
+    };
+
     static const std::unordered_map<TileType, const std::string> tile_sprite = {
         { TileType::Grass, "\x1b[42m" },
         { TileType::Water, "\x1b[44m" },
         { TileType::Mine, "\x1b[43m" },
+        { TileType::Wall, "\x1b[47m" },
         { TileType::None, "\x1b[m!" }
+    };
+
+    static const std::unordered_map<char, TileType> tile_letter = {
+        { 'O', TileType::Grass },
+        { ' ', TileType::Grass },
+        { '~', TileType::Water },
+        { 'X', TileType::Mine },
+        { 'W', TileType::Wall },
+        { '!', TileType::None }
     };
 
     static const std::unordered_map<UnitType, int> unit_mineral_cost = {

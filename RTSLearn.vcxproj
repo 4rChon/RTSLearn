@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Game\Actions\Attack.cpp" />
     <ClCompile Include="src\Game\Actions\Build.cpp" />
     <ClCompile Include="src\Game\Actions\Gather.cpp" />
     <ClCompile Include="src\Game\Pathfinder.cpp" />
@@ -154,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="include\Game\AbilityType.h" />
     <ClInclude Include="include\Game\Actions\ActionResult.h" />
+    <ClInclude Include="include\Game\Actions\Attack.h" />
     <ClInclude Include="include\Game\Actions\Build.h" />
     <ClInclude Include="include\Game\Actions\Gather.h" />
     <ClInclude Include="include\Game\Actions\Move.h" />
@@ -181,6 +183,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\map.json" />
+    <None Include="assets\map_20x20.json" />
+    <None Include="assets\map_50x50.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

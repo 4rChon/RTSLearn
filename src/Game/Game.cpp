@@ -4,6 +4,7 @@
 #include <Game/Tile.h>
 #include <Game/Unit.h>
 #include <Game/UnitType.h>
+#include <Game/Actions/Attack.h>
 #include <Game/Actions/Train.h>
 #include <Game/Actions/Noop.h>
 #include <Game/Actions/Move.h>
@@ -17,7 +18,7 @@
 #include <iostream>
 
 Game::Game() 
-    : map(std::make_shared<Map>())
+    : map(nullptr)
     , ticks(0) {}
 
 void Game::buffer_action(const PlayerInput& input) {
@@ -36,56 +37,35 @@ void Game::step() {
             case ActionType::Noop:
                 break;
             case ActionType::Click: {
-                // we need to perform a context dependent action
-                auto tile = map->get_tile(input.target).lock();
-                auto tile_unit = tile->get_unit().lock();
-                
-                auto x = tile->get_position().first;
-                auto y = tile->get_position().second;
+                auto target_tile = map->get_tile(input.target).lock();
+                auto target_unit = target_tile->get_unit().lock();
 
-                // if the target is a friendly unit, select it
-                if (tile_unit && tile_unit->get_owner() == input.player_id) {
-                    player->select_unit(tile_unit->get_id());
-
+                if (select(target_unit, player)) {
                     break;
                 }
                 
-                // if the target is an enemy unit, check if we have a unit selected, if so, attack it
-                //if (tile_unit && tile_unit->get_owner() != input.player_id) {
-                //	auto unit = player->get_selected_unit().lock();
-                //	if (unit) {
-                //		auto action = std::make_shared<Action>(Attack(input.target, actor, player, game));
-                //		unit->enqueue_action(action);
-                //	}
-                //	break;
-                //}
-
-                // if the target is a pathable tile, check if we have a unit selected, if so, move to it
-                if (tile->is_pathable()) {
-                    if (selected_unit_id < 0) {
-                        break;
-                    }
-
-                    if (!units.contains(selected_unit_id)) {
-                        break;
-                    }
-
-                    auto& unit = units[selected_unit_id];
-                    auto& unit_abilities = Constants::unit_abilities.at(unit->get_type());
-                    if (unit_abilities.contains(AbilityType::Gather) && tile->get_type() == TileType::Mine) {
-                        auto action = std::make_unique<Gather>(input.target, unit, player, game);
-                        unit->enqueue_action(std::move(action), true);
-
-                        break;
-                    }
-
-                    if (unit_abilities.contains(AbilityType::Move)) {
-                        auto action = std::make_unique<Move>(Move(input.target, unit, player, game));
-                        unit->enqueue_action(std::move(action), true);
-
-                        break;
-                    }
+                if (selected_unit_id < 0 || !units.contains(selected_unit_id)) {
+                    break;
                 }
+
+                auto& selected_unit = units[selected_unit_id];
+                if (!selected_unit || !selected_unit->is_alive()) {
+                    break;
+                }
+
+                if (attack(selected_unit, target_unit, input, player, game)) {
+                    break;
+                }
+
+                if (!target_tile->is_pathable()) {
+                    break;
+                }
+
+                if (gather(selected_unit, target_tile, input, player, game)) {
+                    break;
+                }
+
+                move(selected_unit, input, player, game);
                 break;
             }
             case ActionType::TrainWorker: {
@@ -119,6 +99,12 @@ void Game::step() {
         unit_kv.second->act();
     }
 
+    for (auto& unit_kv : units) {
+        if (!unit_kv.second->is_alive()) {
+            destroy_unit(unit_kv.second);
+        }
+    }
+
     ++ticks;
 }
 
@@ -149,40 +135,11 @@ void Game::render() {
 }
 
 void Game::load_map(const std::string& map_name) {
-    std::ifstream file;
-    file.open(map_name);
-
-    if (file.fail()) {
-        perror(map_name.c_str());
-        exit(1);
-    }
-
-    nlohmann::json j = nlohmann::json::parse(file);
-
-    int width = j["dimensions"]["width"];
-    int height = j["dimensions"]["height"];
-    int players = j["players"];
-    map->initialize({ width, height });
-
-    std::vector<Vec2i> starting_locations;
-
-    for (auto y = 0; y < height; ++y) {
-        std::string line = j["tiles"][y];
-        for (auto x = 0; x < width; ++x) {
-            auto letter = line[x];
-
-            map->set_tile({ x, y }, Tile::create_tile({ x, y }, letter));
-            if (letter == 'O') {
-                starting_locations.push_back({ x, y });
-            }
-        }
-    }
-
-    for (auto i = 0; i < players; ++i) {
+    map = std::make_shared<Map>(map_name);
+    auto starting_locations = map->get_starting_locations();
+    for (auto i = 0; i < starting_locations.size(); ++i) {
         init_player(i, starting_locations[i]);
     }
-
-    file.close();
 }
 
 std::weak_ptr<Map> Game::get_map() {
@@ -231,6 +188,57 @@ void Game::build(const PlayerInput& input, std::weak_ptr<Player> player, std::we
     }
 }
 
+bool Game::select(std::shared_ptr<Unit> unit, std::shared_ptr<Player> player) {
+    if (!unit || unit->get_owner() != player->get_id()) {
+        return false;
+    }
+
+    player->select_unit(unit->get_id());
+
+    return false;
+}
+
+bool Game::move(std::shared_ptr<Unit> selected_unit, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
+{
+    auto& unit_abilities = Constants::unit_abilities.at(selected_unit->get_type());
+    if (!unit_abilities.contains(AbilityType::Move)) {
+        return false;
+    }
+
+    auto action = std::make_unique<Move>(Move(input.target, selected_unit, player, game));
+    selected_unit->enqueue_action(std::move(action), true);
+}
+
+bool Game::attack(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Unit> target_unit, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
+{
+    if (!target_unit || target_unit->get_owner() == input.player_id) {
+        return false;
+    }
+ 
+    auto& unit_abilities = Constants::unit_abilities.at(selected_unit->get_type());
+    if (!unit_abilities.contains(AbilityType::Attack)) {
+        return false;
+    }
+
+    auto action = std::make_unique<Attack>(input.target, selected_unit, player, game);
+    selected_unit->enqueue_action(std::move(action), true);
+
+    return true;
+}
+
+bool Game::gather(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Tile> target_tile, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
+{
+    auto& unit_abilities = Constants::unit_abilities.at(selected_unit->get_type());
+    if (!unit_abilities.contains(AbilityType::Gather) || target_tile->get_type() != TileType::Mine) {
+        return false;
+    }
+
+    auto action = std::make_unique<Gather>(input.target, selected_unit, player, game);
+    selected_unit->enqueue_action(std::move(action), true);
+
+    return true;
+}
+
 void Game::create_unit(UnitType unit_type, const Vec2i& position, int player_id) {
     auto unit = std::make_shared<Unit>(unit_type, position, player_id);
     units.insert({ unit->get_id(), unit });
@@ -245,7 +253,7 @@ void Game::destroy_unit(const std::shared_ptr<Unit>& unit) {
 
     auto unit_type = unit->get_type();
 
-    players[unit->get_owner()]->modify_supply(Constants::unit_supply_cost.at(unit_type));
+    players[unit->get_owner()]->modify_supply(-Constants::unit_supply_cost.at(unit_type));
     players[unit->get_owner()]->modify_max_supply(-Constants::unit_supply_provided.at(unit_type));
 }
 
@@ -304,12 +312,21 @@ std::weak_ptr<Tile> Game::get_nearest_pathable_tile(const Vec2i& position) {
 }
 
 std::vector<ActionType> Game::get_available_actions(int player_id) {
-    auto selected_unit = players[player_id]->get_selected_unit_id();
-    if (selected_unit < 0) {
+    auto selected_unit_id = players[player_id]->get_selected_unit_id();
+    if (selected_unit_id < 0) {
         return { ActionType::Noop, ActionType::Click };
     }
 
-    return units[selected_unit]->get_available_actions();
+    if (!units.contains(selected_unit_id)) {
+        return { ActionType::Noop, ActionType::Click };
+    }
+
+    auto& unit = units[selected_unit_id];
+    if (!unit || !unit->is_alive()) {
+        return { ActionType::Noop, ActionType::Click };
+    }
+
+    return unit->get_available_actions();
 }
 
 bool Game::move_unit(std::shared_ptr<Unit> unit, const Vec2i& target) {

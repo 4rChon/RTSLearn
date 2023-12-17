@@ -198,8 +198,7 @@ bool Game::select(std::shared_ptr<Unit> unit, std::shared_ptr<Player> player) {
     return false;
 }
 
-bool Game::move(std::shared_ptr<Unit> selected_unit, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
-{
+bool Game::move(std::shared_ptr<Unit> selected_unit, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game) {
     auto& unit_abilities = Constants::unit_abilities.at(selected_unit->get_type());
     if (!unit_abilities.contains(AbilityType::Move)) {
         return false;
@@ -209,8 +208,7 @@ bool Game::move(std::shared_ptr<Unit> selected_unit, const PlayerInput& input, s
     selected_unit->enqueue_action(std::move(action), true);
 }
 
-bool Game::attack(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Unit> target_unit, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
-{
+bool Game::attack(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Unit> target_unit, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game) {
     if (!target_unit || target_unit->get_owner() == input.player_id) {
         return false;
     }
@@ -226,8 +224,7 @@ bool Game::attack(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Unit> tar
     return true;
 }
 
-bool Game::gather(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Tile> target_tile, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
-{
+bool Game::gather(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Tile> target_tile, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game) {
     auto& unit_abilities = Constants::unit_abilities.at(selected_unit->get_type());
     if (!unit_abilities.contains(AbilityType::Gather) || target_tile->get_type() != TileType::Mine) {
         return false;
@@ -263,10 +260,6 @@ std::weak_ptr<Tile> Game::get_nearest_pathable_tile(const Vec2i& position) {
         return tile;
     }
 
-    auto x_max = map->get_size().second;
-    auto y_max = map->get_size().first;
-
-    // check cardinal directions
     auto tile_right = map->get_tile({ position.first + 1, position.second }).lock();
     if (tile_right->is_pathable()) {
         return tile_right;
@@ -287,7 +280,6 @@ std::weak_ptr<Tile> Game::get_nearest_pathable_tile(const Vec2i& position) {
         return tile_up;
     }
 
-    // check diagonals
     auto tile_down_right = map->get_tile({ position.first + 1, position.second + 1 }).lock();
     if (tile_down_right->is_pathable()) {
         return tile_down_right;

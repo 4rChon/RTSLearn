@@ -42,25 +42,21 @@ ActionResult Train::act() {
         return ActionResult::Running;
     }
 
-    if (progress >= target_progress) {
-        auto game = this->game.lock();
-        if (!game) {
-            return ActionResult::Failure;
-        }
-
-        auto& position = this->actor.lock()->get_position();
-        auto nearest_pathable_tile = game->get_nearest_pathable_tile(position).lock();
-        if (!nearest_pathable_tile) {
-            return ActionResult::Running;
-        }
-
-        game->create_unit(unit_type, nearest_pathable_tile->get_position(), player->get_id());
-
-        return ActionResult::Success;
+    auto game = this->game.lock();
+    if (!game) {
+        return ActionResult::Failure;
     }
 
+    auto& position = this->actor.lock()->get_position();
+    auto nearest_pathable_tile = game->get_nearest_pathable_tile(position).lock();
+    if (!nearest_pathable_tile) {
+        return ActionResult::Running;
+    }
 
-    return ActionResult::Running;
+    game->create_unit(unit_type, nearest_pathable_tile->get_position(), player->get_id());
+
+    return ActionResult::Success;
+
 }
 
 void Train::cancel() {

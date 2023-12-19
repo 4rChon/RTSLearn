@@ -13,9 +13,7 @@
 #include <Game/Renderer.h>
 #include <TypeDefs.h>
 #include <memory>
-#include <sstream>
-#include <iostream>
-#include <chrono>
+#include <string>
 
 Game::Game(unsigned short max_fps) 
     : map(nullptr)

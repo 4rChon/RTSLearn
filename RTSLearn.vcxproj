@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Game\Renderer.cpp" />
     <ClCompile Include="src\Game\Actions\Attack.cpp" />
     <ClCompile Include="src\Game\Actions\Build.cpp" />
     <ClCompile Include="src\Game\Actions\Gather.cpp" />
@@ -145,6 +146,7 @@
     <ClCompile Include="src\Game\Actions\Action.cpp" />
     <ClCompile Include="src\Game\Actions\Noop.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
+    <ClCompile Include="src\Game\ResourceLoader.cpp" />
     <ClCompile Include="src\Game\Unit.cpp" />
     <ClCompile Include="src\Game\Map.cpp" />
     <ClCompile Include="src\Gym\Agent.cpp" />
@@ -166,6 +168,8 @@
     <ClInclude Include="include\Game\Actions\Action.h" />
     <ClInclude Include="include\Game\Game.h" />
     <ClInclude Include="include\Game\Pathfinder.h" />
+    <ClInclude Include="include\Game\Renderer.h" />
+    <ClInclude Include="include\Game\ResourceLoader.h" />
     <ClInclude Include="include\Game\Unit.h" />
     <ClInclude Include="include\Game\UnitAction.h" />
     <ClInclude Include="include\Game\UnitState.h" />

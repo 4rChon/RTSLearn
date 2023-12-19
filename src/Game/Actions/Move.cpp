@@ -43,7 +43,7 @@ ActionResult Move::act() {
         return ActionResult::Failure;
     }
 
-    if (!game->move_unit(unit, path[path.size() - (1 + ++path_index)])) {
+    if (!game->move_unit(unit, path[path.size() - (2 + path_index++)])) {
         path_index = 0;
     }
 

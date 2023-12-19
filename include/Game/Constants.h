@@ -7,7 +7,7 @@
 #include <string>
 
 namespace Constants {
-    static const int INITIAL_TILE_MINERALS = 100;
+    static const int INITIAL_TILE_MINERALS = 200;
     static const int INITIAL_PLAYER_MINERALS = 100;
 
     static const std::unordered_map<UnitType, std::unordered_set<AbilityType>> unit_abilities = {

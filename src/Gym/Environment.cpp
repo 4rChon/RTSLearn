@@ -12,8 +12,7 @@ namespace Gym {
         : metadata(metadata)
         , seed(0)
         , tick(0)
-        , done(false)
-        , render_flag(false) {
+        , done(false) {
     }
 
     std::tuple<std::shared_ptr<Observation>, std::shared_ptr<Info>> Environment::reset(const std::string& map_name, unsigned int seed) {
@@ -31,7 +30,7 @@ namespace Gym {
             game.reset();
         }
 
-        game = std::make_shared<Game>();
+        game = std::make_shared<Game>(metadata.render_fps);
         game->load_map(map_name);
 
         auto obs = _observation();
@@ -40,11 +39,7 @@ namespace Gym {
         if (metadata.render_mode == RenderMode::Human) {
             render_thread = std::thread([&]() {
                 while (!done) {
-                    if (render_flag) {
-                        this->render();
-                        render_flag = false;
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / metadata.render_fps));
-                    }
+                    this->render();
                 }
             });
         }
@@ -62,10 +57,6 @@ namespace Gym {
         game->step();
 
         ++tick;
-
-        if (metadata.render_mode == RenderMode::Human) {
-            render_flag = true;
-        }
 
         auto obs = _observation();
         double reward = 0.0;

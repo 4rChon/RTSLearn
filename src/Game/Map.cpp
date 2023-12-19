@@ -1,22 +1,11 @@
 #include <Game/Map.h>
 #include <Game/Constants.h>
-#include <nlohmann/json.hpp>
+#include <Game/ResourceLoader.h>
 #include <fstream>
 #include <memory>
 
 Map::Map(const std::string map_name) {
-    std::ifstream file;
-    file.open(map_name);
-
-    if (file.fail()) {
-        perror(map_name.c_str());
-        exit(1);
-    }
-
-    // TODO: we should catch this and close the file to be safe
-    nlohmann::json j = nlohmann::json::parse(file);
-
-    file.close();
+    auto j = ResourceLoader::load_json(map_name);
 
     int width = j["dimensions"]["width"];
     int height = j["dimensions"]["height"];

@@ -17,7 +17,7 @@ class Tile;
 
 class Game : public std::enable_shared_from_this<Game> {
 public:
-    Game();
+    Game(unsigned short max_fps);
     void buffer_action(const PlayerInput& action);
     void step();
     void render();

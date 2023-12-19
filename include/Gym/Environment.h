@@ -31,7 +31,6 @@ namespace Gym {
         std::shared_ptr<Game> game;
         std::thread render_thread;
         bool done;
-        bool render_flag;
 
         const std::shared_ptr<Info> _info() const;
         const std::shared_ptr<Observation> _observation() const;

@@ -10,16 +10,18 @@
 #include <Game/Actions/Move.h>
 #include <Game/Actions/Gather.h>
 #include <Game/Actions/Build.h>
+#include <Game/Renderer.h>
 #include <TypeDefs.h>
-#include <nlohmann/json.hpp>
-#include <fstream>
 #include <memory>
 #include <sstream>
 #include <iostream>
+#include <chrono>
 
-Game::Game() 
+Game::Game(unsigned short max_fps) 
     : map(nullptr)
-    , ticks(0) {}
+    , ticks(0) {
+    Renderer::init(max_fps);
+}
 
 void Game::buffer_action(const PlayerInput& input) {
     input_buffer.push(input);
@@ -109,29 +111,7 @@ void Game::step() {
 }
 
 void Game::render() {
-    std::stringstream ss;
-    ss << "\x1b[m\x1b[2J";
-
-    auto& size = map->get_size();
-    auto x_max = size.second;
-    auto y_max = size.first;
-    for (auto y = 0; y < y_max; ++y) {
-        for (auto x = 0; x < x_max; ++x) {
-            if (auto tile_ptr = map->get_tile({ x, y }).lock()) {
-                ss << tile_ptr->get_sprite();
-            }
-        }
-
-        ss << "\x1b[m\n";
-    }
-
-    for (const auto& player : players) {
-        ss << player->get_resources_string() << '\n';
-    }
-
-    ss << "Ticks: " << ticks << '\n';
-
-    std::cout << ss.str();
+    Renderer::render(ticks, players, map);
 }
 
 void Game::load_map(const std::string& map_name) {

@@ -17,6 +17,7 @@ int main() {
     std::shared_ptr<Info> info;
     bool done = false;
 
+    auto total_time = 0ll;
     for (int episode = 0; episode < MAX_EPISODES; ++episode)
     {
         std::tie(obs, info) = env.reset("assets/map.json");
@@ -38,13 +39,14 @@ int main() {
             obs = next_obs;
         }
         auto end_time = std::chrono::high_resolution_clock::now();
-        auto total_time = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
-        std::cout << "Average Frame Time: " << (double)total_time / (double)MAX_STEPS << " nanoseconds" << std::endl;
-        std::cout << "FPS: " << 1000000000 / ((double)total_time / (double)MAX_STEPS) << std::endl;
-        std::cout << "Total time: " << total_time << " nanoseconds" << std::endl;
+        total_time += std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
 
         env.close();
     }
+
+    std::cout << "Average Frame Time: " << (double)total_time / (double)(MAX_STEPS * MAX_EPISODES) << "ns" << std::endl;
+    std::cout << "FPS: " << 1000000000 / ((double)total_time / (double)(MAX_STEPS * MAX_EPISODES)) << std::endl;
+    std::cout << "Total time: " << total_time << "ns" << std::endl;
 
     return 0;
 }

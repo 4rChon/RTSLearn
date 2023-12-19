@@ -251,8 +251,9 @@ void Game::destroy_unit(const std::shared_ptr<Unit>& unit) {
     auto map_size = map->get_size();
     for (auto x = max(0, unit_position.first - sight_range); x <= min(map_size.first - 1, unit_position.first + sight_range); ++x) {
         for (auto y = max(0, unit_position.second - sight_range); y <= min(map_size.second - 1, unit_position.second + sight_range); ++y) {
-            if (map->has_line_of_sight({ x, y }, unit_position)) {
-                players[player_id]->modify_vision({ x, y }, -1);
+            auto pos = std::make_pair(x, y);
+            if (map->has_line_of_sight(pos, unit_position)) {
+                players[player_id]->modify_vision(pos, -1);
             }
         }
     }
@@ -345,8 +346,9 @@ bool Game::move_unit(std::shared_ptr<Unit> unit, const Vec2i& target) {
     auto map_size = map->get_size();
     for (auto x = max(0, old_position.first - sight_range); x <= min(map_size.first - 1, old_position.first + sight_range); ++x) {
         for (auto y = max(0, old_position.second - sight_range); y <= min(map_size.second - 1, old_position.second + sight_range); ++y) {
-            if (map->has_line_of_sight({ x, y }, old_position)) {
-                players[player_id]->modify_vision({ x, y }, -1);
+            auto pos = std::make_pair(x, y);
+            if (map->has_line_of_sight(pos, old_position)) {
+                players[player_id]->modify_vision(pos, -1);
             }
         }
     }

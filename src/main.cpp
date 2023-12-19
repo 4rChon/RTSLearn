@@ -1,5 +1,5 @@
 constexpr auto MAX_STEPS = 1000000;
-constexpr auto MAX_EPISODES = 10;
+constexpr auto MAX_EPISODES = 1;
 
 #include <Gym/Environment.h>
 #include <chrono>

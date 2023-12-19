@@ -19,7 +19,7 @@ private:
     Vec2i size;
     std::vector<std::vector<std::shared_ptr<Tile>>> tilemap;
     std::vector<std::vector<int>> pathable_map;
-    std::unordered_map<Vec2i, std::unordered_map<Vec2i, bool>> line_of_sight_cache;
+    std::vector<std::vector<std::vector<std::vector<bool>>>> line_of_sight_cache;
 
     bool cast_sight_line(const Vec2i& start, const Vec2i& end) const;
     void set_tile(const Vec2i& pos, std::shared_ptr<Tile> tile);

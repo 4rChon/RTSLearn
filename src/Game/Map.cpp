@@ -30,11 +30,12 @@ Map::Map(const std::string map_name) {
     }
 
     // initialize line of sight cache
+    line_of_sight_cache.resize(width, std::vector<std::vector<std::vector<bool>>>(height, std::vector<std::vector<bool>>(width, std::vector<bool>(height))));
     for (auto y = 0; y < height; ++y) {
         for (auto x = 0; x < width; ++x) {
             for (auto y2 = 0; y2 < height; ++y2) {
                 for (auto x2 = 0; x2 < width; ++x2) {
-                    line_of_sight_cache[Vec2i{ x, y }][Vec2i{ x2, y2 }] = cast_sight_line({ x, y }, { x2, y2 });
+                    line_of_sight_cache[x][y][x2][y2] = cast_sight_line({ x, y }, { x2, y2 });
                 }
             }
         }
@@ -54,7 +55,7 @@ const Vec2i& Map::get_size() const {
 }
 
 bool Map::has_line_of_sight(const Vec2i& start, const Vec2i& end) const {
-    return line_of_sight_cache.at(start).at(end);
+    return line_of_sight_cache[start.first][start.second][end.first][end.second];
 }
 
 std::vector<std::vector<int>> Map::get_pathable_map() const {

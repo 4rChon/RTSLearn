@@ -31,7 +31,6 @@ void Game::step() {
         input_buffer.pop();
 
         auto& player = players[input.player_id];
-        auto game = std::weak_ptr<Game>(shared_from_this());
         auto selected_unit_id = player->get_selected_unit_id();
         switch (input.type) {
             case ActionType::Noop:
@@ -53,6 +52,7 @@ void Game::step() {
                     break;
                 }
 
+                auto game = shared_from_this();
                 if (attack(selected_unit, target_unit, input, player, game)) {
                     break;
                 }
@@ -69,27 +69,27 @@ void Game::step() {
                 break;
             }
             case ActionType::TrainWorker: {
-                train(input, player, game, selected_unit_id, UnitType::Worker);
+                train(input, player, shared_from_this(), UnitType::Worker);
                 break;
             }
             case ActionType::TrainMeleeWarrior: {
-                train(input, player, game, selected_unit_id, UnitType::MeleeWarrior);
+                train(input, player, shared_from_this(), UnitType::MeleeWarrior);
                 break;
             }
             case ActionType::TrainRangedWarrior: {
-                train(input, player, game, selected_unit_id, UnitType::RangedWarrior);
+                train(input, player, shared_from_this(), UnitType::RangedWarrior);
                 break;
             }
             case ActionType::BuildFarm: {
-                build(input, player, game, selected_unit_id, UnitType::Farm);
+                build(input, player, shared_from_this(), UnitType::Farm);
                 break;
             }
             case ActionType::BuildBarracks: {
-                build(input, player, game, selected_unit_id, UnitType::Barracks);
+                build(input, player, shared_from_this(), UnitType::Barracks);
                 break;
             }
             case ActionType::BuildTownHall: {
-                build(input, player, game, selected_unit_id, UnitType::TownHall);
+                build(input, player, shared_from_this(), UnitType::TownHall);
                 break;
             }
         }
@@ -132,7 +132,8 @@ void Game::init_player(int player_id, const Vec2i& starting_location) {
     create_unit(UnitType::TownHall, starting_location, player_id);
 }
 
-void Game::train(const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game, int selected_unit_id, UnitType unit_type) {
+void Game::train(const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game, UnitType unit_type) {
+    auto selected_unit_id = player->get_selected_unit_id();
     if (selected_unit_id < 0) {
         return;
     }
@@ -149,7 +150,8 @@ void Game::train(const PlayerInput& input, std::weak_ptr<Player> player, std::we
     }
 }
 
-void Game::build(const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game, int selected_unit_id, UnitType unit_type) {
+void Game::build(const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game, UnitType unit_type) {
+    auto selected_unit_id = player->get_selected_unit_id();
     if (selected_unit_id < 0) {
         return;
     }
@@ -176,7 +178,7 @@ bool Game::select(std::shared_ptr<Unit> unit, std::shared_ptr<Player> player) {
     return false;
 }
 
-bool Game::move(std::shared_ptr<Unit> selected_unit, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game) {
+bool Game::move(std::shared_ptr<Unit> selected_unit, const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game) {
     auto& unit_abilities = Constants::unit_abilities.at(selected_unit->get_type());
     if (!unit_abilities.contains(AbilityType::Move)) {
         return false;
@@ -186,7 +188,7 @@ bool Game::move(std::shared_ptr<Unit> selected_unit, const PlayerInput& input, s
     selected_unit->enqueue_action(std::move(action), true);
 }
 
-bool Game::attack(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Unit> target_unit, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game) {
+bool Game::attack(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Unit> target_unit, const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game) {
     if (!target_unit || target_unit->get_owner() == input.player_id) {
         return false;
     }
@@ -202,7 +204,7 @@ bool Game::attack(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Unit> tar
     return true;
 }
 
-bool Game::gather(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Tile> target_tile, const PlayerInput& input, std::weak_ptr<Player> player, std::weak_ptr<Game> game) {
+bool Game::gather(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Tile> target_tile, const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game) {
     auto& unit_abilities = Constants::unit_abilities.at(selected_unit->get_type());
     if (!unit_abilities.contains(AbilityType::Gather) || target_tile->get_type() != TileType::Mine) {
         return false;

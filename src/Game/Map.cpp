@@ -83,7 +83,7 @@ bool Map::cast_sight_line(const Vec2i& start, const Vec2i& end) const {
     auto err = dx + dy;
 
     while (true) {
-        if (!tilemap[y0][x0]->is_vision_blocker()) {
+        if (tilemap[y0][x0]->is_vision_blocker()) {
             return false;
         }
 

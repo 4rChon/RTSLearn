@@ -21,8 +21,13 @@ namespace Renderer {
         auto y_max = size.first;
         for (auto y = 0; y < y_max; ++y) {
             for (auto x = 0; x < x_max; ++x) {
-                if (auto tile_ptr = map->get_tile({ x, y }).lock()) {
-                    ss << tile_ptr->get_sprite();
+                if (players[0]->get_vision({ x, y })) {
+                    if (auto tile_ptr = map->get_tile({ x, y }).lock()) {
+                        ss << tile_ptr->get_sprite();
+                    }
+                }
+                else {
+                    ss << "\x1b[40m  ";
                 }
             }
 

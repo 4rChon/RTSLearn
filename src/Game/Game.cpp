@@ -15,6 +15,10 @@
 #include <memory>
 #include <string>
 
+// define min and max
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((b) < (a) ? (a) : (b))
+
 Game::Game(unsigned short max_fps) 
     : map(nullptr)
     , ticks(0) {
@@ -186,6 +190,8 @@ bool Game::move(std::shared_ptr<Unit> selected_unit, const PlayerInput& input, s
 
     auto action = std::make_unique<Move>(Move(input.target, selected_unit, player, game));
     selected_unit->enqueue_action(std::move(action), true);
+
+    return true;
 }
 
 bool Game::attack(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Unit> target_unit, const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game) {
@@ -222,13 +228,37 @@ void Game::create_unit(UnitType unit_type, const Vec2i& position, int player_id)
     map->get_tile(position).lock()->set_unit(unit);
 
     players[player_id]->modify_max_supply(Constants::unit_supply_provided.at(unit_type));
+
+    // update vision tiles
+    auto sight_range = Constants::unit_sight_range.at(unit_type);
+    auto& unit_position = unit->get_position();
+
+    auto map_size = map->get_size();
+    for (auto x = max(0, unit_position.first - sight_range); x <= min(map_size.first - 1, unit_position.first + sight_range); ++x) {
+        for (auto y = max(0, unit_position.second - sight_range); y <= min(map_size.second - 1, unit_position.second + sight_range); ++y) {
+            players[player_id]->modify_vision({ x, y }, map->has_line_of_sight({ x, y }, unit_position));
+        }
+    }
 }
 
 void Game::destroy_unit(const std::shared_ptr<Unit>& unit) {
+    auto unit_type = unit->get_type();
+    auto player_id = unit->get_owner();
+
+    auto sight_range = Constants::unit_sight_range.at(unit_type);
+    auto& unit_position = unit->get_position();
+
+    auto map_size = map->get_size();
+    for (auto x = max(0, unit_position.first - sight_range); x <= min(map_size.first - 1, unit_position.first + sight_range); ++x) {
+        for (auto y = max(0, unit_position.second - sight_range); y <= min(map_size.second - 1, unit_position.second + sight_range); ++y) {
+            if (map->has_line_of_sight({ x, y }, unit_position)) {
+                players[player_id]->modify_vision({ x, y }, -1);
+            }
+        }
+    }
+
     units.erase(unit->get_id());
     map->get_tile(unit->get_position()).lock()->unset_unit();
-
-    auto unit_type = unit->get_type();
 
     players[unit->get_owner()]->modify_supply(-Constants::unit_supply_cost.at(unit_type));
     players[unit->get_owner()]->modify_max_supply(-Constants::unit_supply_provided.at(unit_type));
@@ -306,9 +336,30 @@ bool Game::move_unit(std::shared_ptr<Unit> unit, const Vec2i& target) {
         return false;
     }
 
-    map->get_tile(unit->get_position()).lock()->unset_unit();
+    auto unit_type = unit->get_type();
+    auto player_id = unit->get_owner();
+
+    auto sight_range = Constants::unit_sight_range.at(unit_type);
+    auto& old_position = unit->get_position();
+
+    auto map_size = map->get_size();
+    for (auto x = max(0, old_position.first - sight_range); x <= min(map_size.first - 1, old_position.first + sight_range); ++x) {
+        for (auto y = max(0, old_position.second - sight_range); y <= min(map_size.second - 1, old_position.second + sight_range); ++y) {
+            if (map->has_line_of_sight({ x, y }, old_position)) {
+                players[player_id]->modify_vision({ x, y }, -1);
+            }
+        }
+    }
+
+    map->get_tile(old_position).lock()->unset_unit();
     unit->set_position(target);
     map->get_tile(target).lock()->set_unit(unit);
+
+    for (auto x = max(0, target.first - sight_range); x <= min(map_size.first - 1, target.first + sight_range); ++x) {
+        for (auto y = max(0, target.second - sight_range); y <= min(map_size.second - 1, target.second + sight_range); ++y) {
+            players[player_id]->modify_vision({ x, y }, map->has_line_of_sight({ x, y }, target));
+        }
+    }
 
     return true;
 }

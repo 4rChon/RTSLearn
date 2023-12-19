@@ -47,3 +47,11 @@ int Player::get_selected_unit_id() const {
 const std::string Player::get_resources_string() const {
     return std::to_string(id) + " :: Minerals: " + std::to_string(minerals) + " Supply: " + std::to_string(supply) + "/" + std::to_string(max_supply);
 }
+
+void Player::modify_vision(const Vec2i& position, int value) {
+    vision[position] += value;
+}
+
+bool Player::get_vision(const Vec2i& position) {
+    return vision[position];
+}

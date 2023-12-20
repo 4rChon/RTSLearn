@@ -7,14 +7,14 @@
   "players": 2,
   "tiles": [
     "WWWWWWWWWW",
-    "WO X~  X W",
+    "WO XW  X W",
     "W   ~    W",
-    "W   ~    W",
+    "W   W    W",
     "W        W",
     "W        W",
+    "W    W   W",
     "W    ~   W",
-    "W    ~   W",
-    "W X  ~X OW",
+    "W X  WX OW",
     "WWWWWWWWWW"
   ]
 }

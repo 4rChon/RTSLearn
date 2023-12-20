@@ -1,7 +1,7 @@
 #include <Game/Actions/Train.h>
 #include <Game/Constants.h>
 
-Train::Train(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, UnitType unit_type)
+Train::Train(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, UnitType unit_type)
     : Action(target, actor, player, game, Constants::unit_create_sprite.at(unit_type))
     , unit_type(unit_type)
     , progress(0)

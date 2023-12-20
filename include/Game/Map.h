@@ -9,18 +9,18 @@ class Map {
 public:
     Map(const std::string map_name);
     
-    std::weak_ptr<Tile> get_tile(const Vec2i& pos) const;
-    const Vec2i& get_size() const;
-    bool has_line_of_sight(const Vec2i& start, const Vec2i& end) const;
-    std::vector<std::vector<int>> get_pathable_map() const;
-    std::vector<Vec2i> get_starting_locations() const;
+    std::weak_ptr<Tile> get_tile(const vec2& pos) const;
+    const vec2& get_size() const;
+    bool has_line_of_sight(const vec2& start, const vec2& end) const;
+    std::vector<std::vector<bool>> get_pathable_map();
+    std::vector<vec2> get_starting_locations() const;
 private:
-    std::vector<Vec2i> starting_locations;
-    Vec2i size;
+    std::vector<vec2> starting_locations;
+    vec2 size;
     std::vector<std::vector<std::shared_ptr<Tile>>> tilemap;
-    std::vector<std::vector<int>> pathable_map;
+    std::vector<std::vector<bool>> pathable_map;
     std::vector<std::vector<std::vector<std::vector<bool>>>> line_of_sight_cache;
 
-    bool cast_sight_line(const Vec2i& start, const Vec2i& end) const;
-    void set_tile(const Vec2i& pos, std::shared_ptr<Tile> tile);
+    bool cast_sight_line(const vec2& start, const vec2& end) const;
+    void set_tile(const vec2& pos, std::shared_ptr<Tile> tile);
 };

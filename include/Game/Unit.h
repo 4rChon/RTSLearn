@@ -12,13 +12,13 @@ class Action;
 
 class Unit {
 public:
-    Unit(UnitType type, const Vec2i& position, int owner);
+    Unit(UnitType type, const vec2& position, int owner);
 
-    void set_position(const Vec2i& position);
+    void set_position(const vec2& position);
 
     int get_id() const;
     int get_owner() const;
-    const Vec2i& get_position() const;
+    const vec2& get_position() const;
     UnitType get_type() const;
     const std::string get_sprite();
 
@@ -32,7 +32,7 @@ private:
     const int id;
     const int owner;
     const UnitType type;
-    Vec2i position;
+    vec2 position;
     int health;
     std::queue<std::unique_ptr<Action>> action_queue;
     // keep a lock resource for the action queue so the renderer doesn't try to render the unit while it's being modified

@@ -128,7 +128,7 @@ std::weak_ptr<Map> Game::get_map() {
     return map;
 }
 
-void Game::init_player(int player_id, const Vec2i& starting_location) {
+void Game::init_player(int player_id, const vec2& starting_location) {
     auto player = std::make_shared<Player>(player_id);
 
     players.push_back(player);
@@ -222,7 +222,7 @@ bool Game::gather(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Tile> tar
     return true;
 }
 
-void Game::create_unit(UnitType unit_type, const Vec2i& position, int player_id) {
+void Game::create_unit(UnitType unit_type, const vec2& position, int player_id) {
     auto unit = std::make_shared<Unit>(unit_type, position, player_id);
     units.insert({ unit->get_id(), unit });
     map->get_tile(position).lock()->set_unit(unit);
@@ -236,7 +236,8 @@ void Game::create_unit(UnitType unit_type, const Vec2i& position, int player_id)
     auto map_size = map->get_size();
     for (auto x = max(0, unit_position.first - sight_range); x <= min(map_size.first - 1, unit_position.first + sight_range); ++x) {
         for (auto y = max(0, unit_position.second - sight_range); y <= min(map_size.second - 1, unit_position.second + sight_range); ++y) {
-            players[player_id]->modify_vision({ x, y }, map->has_line_of_sight({ x, y }, unit_position));
+            auto pos = std::make_pair(x, y);
+            players[player_id]->modify_vision(pos, map->has_line_of_sight(pos, unit_position));
         }
     }
 }
@@ -265,7 +266,7 @@ void Game::destroy_unit(const std::shared_ptr<Unit>& unit) {
     players[unit->get_owner()]->modify_max_supply(-Constants::unit_supply_provided.at(unit_type));
 }
 
-std::weak_ptr<Tile> Game::get_nearest_pathable_tile(const Vec2i& position) {
+std::weak_ptr<Tile> Game::get_nearest_pathable_tile(const vec2& position) {
     auto tile = map->get_tile(position).lock();
     if (tile->is_pathable()) {
         return tile;
@@ -332,8 +333,9 @@ std::vector<ActionType> Game::get_available_actions(int player_id) {
     return unit->get_available_actions();
 }
 
-bool Game::move_unit(std::shared_ptr<Unit> unit, const Vec2i& target) {
-    if (!map->get_tile(target).lock()->is_pathable()) {
+bool Game::move_unit(std::shared_ptr<Unit> unit, const vec2& target) {
+    auto tile = map->get_tile(target).lock();
+    if (!tile->is_pathable()) {
         return false;
     }
 
@@ -343,7 +345,7 @@ bool Game::move_unit(std::shared_ptr<Unit> unit, const Vec2i& target) {
     auto sight_range = Constants::unit_sight_range.at(unit_type);
     auto& old_position = unit->get_position();
 
-    auto map_size = map->get_size();
+    auto &map_size = map->get_size();
     for (auto x = max(0, old_position.first - sight_range); x <= min(map_size.first - 1, old_position.first + sight_range); ++x) {
         for (auto y = max(0, old_position.second - sight_range); y <= min(map_size.second - 1, old_position.second + sight_range); ++y) {
             auto pos = std::make_pair(x, y);
@@ -355,11 +357,12 @@ bool Game::move_unit(std::shared_ptr<Unit> unit, const Vec2i& target) {
 
     map->get_tile(old_position).lock()->unset_unit();
     unit->set_position(target);
-    map->get_tile(target).lock()->set_unit(unit);
+    tile->set_unit(unit);
 
     for (auto x = max(0, target.first - sight_range); x <= min(map_size.first - 1, target.first + sight_range); ++x) {
         for (auto y = max(0, target.second - sight_range); y <= min(map_size.second - 1, target.second + sight_range); ++y) {
-            players[player_id]->modify_vision({ x, y }, map->has_line_of_sight({ x, y }, target));
+            auto pos = std::make_pair(x, y);
+            players[player_id]->modify_vision(pos, map->has_line_of_sight(pos, target));
         }
     }
 

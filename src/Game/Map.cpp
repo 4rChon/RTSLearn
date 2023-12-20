@@ -1,6 +1,7 @@
 #include <Game/Map.h>
 #include <Game/Constants.h>
 #include <Game/ResourceLoader.h>
+#include <TypeDefs.h>
 #include <fstream>
 #include <memory>
 
@@ -21,7 +22,7 @@ Map::Map(const std::string map_name) {
         std::string line = j["tiles"][y];
         for (auto x = 0; x < width; ++x) {
             auto letter = line[x];
-            auto tile = std::make_shared<Tile>(Vec2i{ x, y }, Constants::tile_letter.at(letter));
+            auto tile = std::make_shared<Tile>(vec2{ x, y }, Constants::tile_letter.at(letter));
             set_tile({ x, y }, tile);
             if (letter == 'O') {
                 starting_locations.push_back({ x, y });
@@ -40,38 +41,37 @@ Map::Map(const std::string map_name) {
             }
         }
     }
+
+    pathable_map.resize(width, std::vector<bool>(height));
 }
 
-void Map::set_tile(const Vec2i& pos, std::shared_ptr<Tile> tile) {
+void Map::set_tile(const vec2& pos, std::shared_ptr<Tile> tile) {
     tilemap[pos.second][pos.first] = tile;
 }
 
-std::weak_ptr<Tile> Map::get_tile(const Vec2i& pos) const {
+std::weak_ptr<Tile> Map::get_tile(const vec2& pos) const {
     return tilemap[pos.second][pos.first];
 }
 
-const Vec2i& Map::get_size() const {
+const vec2& Map::get_size() const {
     return size;
 }
 
-bool Map::has_line_of_sight(const Vec2i& start, const Vec2i& end) const {
+bool Map::has_line_of_sight(const vec2& start, const vec2& end) const {
     return line_of_sight_cache[start.first][start.second][end.first][end.second];
 }
 
-std::vector<std::vector<int>> Map::get_pathable_map() const {
-    std::vector<std::vector<int>> pathable_map(size.first, std::vector<int>(size.second, 0));
+std::vector<std::vector<bool>> Map::get_pathable_map() {
     for (int y = 0; y < size.second; ++y) {
         for (int x = 0; x < size.first; ++x) {
-            if (tilemap[y][x]->is_pathable()) {
-                pathable_map[x][y] = 1;
-            }
+            pathable_map[x][y] = tilemap[y][x]->is_pathable();
         }
     }
 
     return pathable_map;
 }
 
-bool Map::cast_sight_line(const Vec2i& start, const Vec2i& end) const {
+bool Map::cast_sight_line(const vec2& start, const vec2& end) const {
     auto x0 = start.first;
     auto y0 = start.second;
     auto x1 = end.first;
@@ -111,6 +111,6 @@ bool Map::cast_sight_line(const Vec2i& start, const Vec2i& end) const {
     }
 }
 
-std::vector<Vec2i> Map::get_starting_locations() const {
+std::vector<vec2> Map::get_starting_locations() const {
     return starting_locations;
 }

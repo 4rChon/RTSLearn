@@ -5,5 +5,5 @@
 struct PlayerInput {
     const int player_id;
     const ActionType type;
-    const Vec2i target;
+    const vec2 target;
 };

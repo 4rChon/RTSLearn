@@ -8,7 +8,7 @@ constexpr auto MAX_EPISODES = 1;
 using namespace Gym;
 
 int main() {
-    Environment env({ RenderMode::Human, 120, 2, MAX_STEPS });
+    Environment env({ RenderMode::Human, 16, 2, MAX_STEPS });
     std::shared_ptr<Observation> obs;
     std::shared_ptr<Observation> next_obs;
     double reward;

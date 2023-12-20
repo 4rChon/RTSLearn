@@ -1,11 +1,10 @@
 #include <Game/Actions/Move.h>
 #include <Game/Pathfinder.h>
 
-Move::Move(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
+Move::Move(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
     : Action(target, actor, player, game, 'm')
     , move_cooldown(0)
-    , path_index(0) {
-}
+    , path_index(0) { }
 
 ActionResult Move::act() {
     auto unit = actor.lock();
@@ -36,7 +35,7 @@ ActionResult Move::act() {
 
     if (path_index == 0) {
         auto pathable_map = map->get_pathable_map();
-        path = Pathfinder::get_path(unit->get_position(), target, pathable_map);
+        Pathfinder::get_path(unit->get_position(), target, pathable_map, path);
     }
 
     if (path.size() == 0) {

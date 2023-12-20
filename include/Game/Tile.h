@@ -10,13 +10,13 @@ class Unit;
 
 class Tile {
 public:
-    Tile(Vec2i position, TileType type);
+    Tile(vec2 position, TileType type);
 
     TileType get_type() const;
     bool is_pathable(bool ignore_unit = false) const;
     bool is_vision_blocker() const;
     int get_minerals() const;
-    const Vec2i& get_position() const;
+    const vec2& get_position() const;
     std::weak_ptr<Unit> get_unit() const;
     std::string get_sprite() const;
 
@@ -31,6 +31,6 @@ private:
     bool pathable;
     bool blocks_vision;
     int minerals;
-    const Vec2i position;
+    const vec2 position;
     std::weak_ptr<Unit> unit;
 };

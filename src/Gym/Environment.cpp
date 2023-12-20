@@ -2,6 +2,7 @@
 #include <Gym/Environment.h>
 #include <Gym/Metadata.h>
 #include <Gym/Observation.h>
+#include <TypeDefs.h>
 #include <memory>
 #include <random>
 #include <string>
@@ -107,7 +108,7 @@ namespace Gym {
 
         std::uniform_int_distribution<> dis_x(0, map_size.first - 1);
         std::uniform_int_distribution<> dis_y(0, map_size.second - 1);
-        Vec2i position = Vec2i(dis_x(gen), dis_y(gen));
+        vec2 position = vec2(dis_x(gen), dis_y(gen));
 
         return PlayerInput{ player_id, action_type, position };
     }

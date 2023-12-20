@@ -16,13 +16,13 @@ public:
     void deselect_unit();
     int get_selected_unit_id() const;
     const std::string get_resources_string() const;
-    void modify_vision(const Vec2i& position, int value);
-    bool get_vision(const Vec2i& position);
+    void modify_vision(const vec2& position, int value);
+    bool get_vision(const vec2& position);
 private:
     const int id;
     int minerals;
     int max_supply;
     int supply;
     int selected_unit_id;
-    std::unordered_map<Vec2i, int> vision;
+    std::unordered_map<vec2, int> vision;
 };

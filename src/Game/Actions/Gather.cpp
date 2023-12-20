@@ -1,7 +1,7 @@
 #include <Game/Actions/Gather.h>
 #include <Game/Actions/Move.h>
 
-Gather::Gather(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
+Gather::Gather(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
     : Action(target, actor, player, game, 'g')
     , target_progress(5)
     , progress(0) {

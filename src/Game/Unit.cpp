@@ -11,14 +11,14 @@
 
 int Unit::next_id = 0;
 
-Unit::Unit(UnitType type, const Vec2i& position, int owner)
+Unit::Unit(UnitType type, const vec2& position, int owner)
     : type(type)
     , position(position)
     , owner(owner)
     , id(next_id++)
     , health(Constants::unit_health.at(type)) {}
 
-void Unit::set_position(const Vec2i& position) {
+void Unit::set_position(const vec2& position) {
     this->position = position;
 }
 
@@ -30,7 +30,7 @@ int Unit::get_owner() const {
     return owner;
 }
 
-const Vec2i& Unit::get_position() const {
+const vec2& Unit::get_position() const {
     return position;
 }
 

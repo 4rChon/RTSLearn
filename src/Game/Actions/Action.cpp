@@ -4,7 +4,7 @@
 #include <TypeDefs.h>
 #include <memory>
 
-Action::Action(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, char sprite)
+Action::Action(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, char sprite)
     : target(target)
     , actor(actor)
     , player(player)

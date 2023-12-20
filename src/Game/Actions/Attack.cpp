@@ -1,6 +1,6 @@
 #include <Game/Actions/Attack.h>
 
-Attack::Attack(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
+Attack::Attack(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
     : Action(target, actor, player, game, 'a')
     , attack_cooldown(0) {
     target_unit = game.lock()->get_map().lock()->get_tile(target).lock()->get_unit();

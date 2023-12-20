@@ -63,6 +63,12 @@
     <ClCompile Include="src\Game\Actions\Attack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Game\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\ResourceLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Gym\Environment.h">
@@ -146,10 +152,17 @@
     <ClInclude Include="include\Game\Actions\Attack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Game\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Game\ResourceLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\map.json" />
     <None Include="assets\map_20x20.json" />
     <None Include="assets\map_50x50.json" />
+    <None Include="assets\map_10x10.json" />
   </ItemGroup>
 </Project>

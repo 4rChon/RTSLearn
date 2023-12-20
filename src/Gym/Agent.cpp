@@ -6,6 +6,6 @@
 
 namespace Gym {
     const PlayerInput& Agent::get_action(const std::weak_ptr<Observation> obs) const {
-        return PlayerInput{ 0, ActionType::Noop, Vec2i(0, 0) };
+        return PlayerInput{ 0, ActionType::Noop, vec2(0, 0) };
     }
 }

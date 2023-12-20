@@ -4,7 +4,7 @@
 #include <Game/Tile.h>
 #include <sstream>
 
-Tile::Tile(Vec2i position, TileType type) 
+Tile::Tile(vec2 position, TileType type) 
     : position(position)
     , type(type)
     , pathable(Constants::tile_pathable.at(type))
@@ -27,7 +27,7 @@ int Tile::get_minerals() const {
     return minerals;
 }
 
-const Vec2i& Tile::get_position() const {
+const vec2& Tile::get_position() const {
     return position;
 }
 

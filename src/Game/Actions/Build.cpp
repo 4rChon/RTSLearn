@@ -1,7 +1,7 @@
 #include <Game/Actions/Build.h>
 #include <Game/Constants.h>
 
-Build::Build(const Vec2i& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, UnitType unit_type)
+Build::Build(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, UnitType unit_type)
     : Action(target, actor, player, game, Constants::unit_create_sprite.at(unit_type))
     , unit_type(unit_type)
     , started(false)

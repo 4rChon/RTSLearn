@@ -187,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\map.json" />
+    <None Include="assets\map_10x10.json" />
     <None Include="assets\map_20x20.json" />
     <None Include="assets\map_50x50.json" />
   </ItemGroup>

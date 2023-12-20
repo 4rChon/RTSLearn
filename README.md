@@ -20,5 +20,6 @@ The goal is to create a performant ASCII-based RTS for use in deep learning envi
 
 ![image](https://github.com/4rChon/RTSLearn/assets/6491290/80e02391-a97b-4fcf-8aa1-4927d5af3bb9)
 
+Tested on i7-6700K @ 4GHz
 
 

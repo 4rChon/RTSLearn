@@ -49,7 +49,7 @@ namespace Pathfinder {
                 auto& neighbour = neighbours[i];
                 auto x_n = neighbour.first;
                 auto y_n = neighbour.second;
-                if (x_n < 0 || x_n >= map_width || y_n < 0 || y_n >= map_height || map[x_n][y_n] == 0) {
+                if (!map[x_n][y_n]) {
                     continue;
                 }
 

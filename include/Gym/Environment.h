@@ -4,6 +4,7 @@
 #include <Game/PlayerInput.h>
 #include <Gym/Metadata.h>
 #include <Gym/Observation.h>
+#include <Gym/Info.h>
 #include <TypeDefs.h>
 #include <random>
 #include <string>
@@ -15,8 +16,8 @@ namespace Gym {
     class Environment {
     public:
         Environment(const Metadata& metadata);
-        std::tuple<std::shared_ptr<Observation>, std::shared_ptr<Info>> reset(const std::string& map_name, unsigned int seed = 0);
-        std::tuple<std::shared_ptr<Observation>, double, bool, bool, std::shared_ptr<Info>> step(std::vector<PlayerInput>& action);
+        std::tuple<Observation*, Info*> reset(const std::string& map_name, unsigned int seed = 0);
+        std::tuple<Observation*, double, bool, bool, Info*> step(std::vector<PlayerInput>& action);
         void close();
         void render() const;
         std::mt19937 get_generator() const;
@@ -32,7 +33,7 @@ namespace Gym {
         std::thread render_thread;
         bool done;
 
-        const std::shared_ptr<Info> _info() const;
-        const std::shared_ptr<Observation> _observation() const;
+        Info* _info() const;
+        Observation* _observation() const;
     };
 }

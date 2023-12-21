@@ -175,6 +175,7 @@
     <ClInclude Include="include\Game\UnitState.h" />
     <ClInclude Include="include\Gym\Agent.h" />
     <ClInclude Include="include\Gym\Environment.h" />
+    <ClInclude Include="include\Gym\Info.h" />
     <ClInclude Include="include\Gym\Metadata.h" />
     <ClInclude Include="include\Gym\Observation.h" />
     <ClInclude Include="include\Game\Map.h" />
@@ -182,6 +183,7 @@
     <ClInclude Include="include\Game\PlayerInput.h" />
     <ClInclude Include="include\Game\Tile.h" />
     <ClInclude Include="include\Game\TileType.h" />
+    <ClInclude Include="include\Gym\Test.h" />
     <ClInclude Include="include\TypeDefs.h" />
     <ClInclude Include="include\Game\UnitType.h" />
   </ItemGroup>

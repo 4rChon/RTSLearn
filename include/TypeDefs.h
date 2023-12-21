@@ -6,7 +6,6 @@
 #include <functional>
 
 typedef std::pair<char, char> vec2;
-typedef std::unordered_map<std::string, void*> Info;
 
 namespace std {
     template<>

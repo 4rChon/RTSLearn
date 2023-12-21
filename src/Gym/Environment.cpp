@@ -2,6 +2,7 @@
 #include <Gym/Environment.h>
 #include <Gym/Metadata.h>
 #include <Gym/Observation.h>
+#include <Gym/Info.h>
 #include <TypeDefs.h>
 #include <memory>
 #include <random>
@@ -16,7 +17,7 @@ namespace Gym {
         , done(false) {
     }
 
-    std::tuple<std::shared_ptr<Observation>, std::shared_ptr<Info>> Environment::reset(const std::string& map_name, unsigned int seed) {
+    std::tuple<Observation*, Info*> Environment::reset(const std::string& map_name, unsigned int seed) {
         if (seed == 0) {
             this->seed = rd();
         }
@@ -34,9 +35,6 @@ namespace Gym {
         game = std::make_shared<Game>(metadata.render_fps);
         game->load_map(map_name);
 
-        auto obs = _observation();
-        auto info = _info();
-
         if (metadata.render_mode == RenderMode::Human) {
             render_thread = std::thread([&]() {
                 while (!done) {
@@ -45,12 +43,10 @@ namespace Gym {
             });
         }
 
-        auto return_val = std::tuple<std::shared_ptr<Observation>, std::shared_ptr<Info>>(obs, info);
-
-        return return_val;
+        return { _observation(), _info() };
     }
 
-    std::tuple<std::shared_ptr<Observation>, double, bool, bool, std::shared_ptr<Info>> Environment::step(std::vector<PlayerInput>& actions) {
+    std::tuple<Observation*, double, bool, bool, Info*> Environment::step(std::vector<PlayerInput>& actions) {
         for (const PlayerInput& player_action : actions) {
             game->buffer_action(player_action);
         }
@@ -59,25 +55,20 @@ namespace Gym {
 
         ++tick;
 
-        auto obs = _observation();
-        double reward = 0.0;
         bool terminated = false;
         bool truncated = tick >= metadata.max_steps;
-        auto info = _info();
-
+        
         done = terminated || truncated;
 
-        auto return_val = std::tuple<const std::shared_ptr<Observation>, double, bool, bool, const std::shared_ptr<Info>>(obs, reward, terminated, truncated, info);
-
-        return return_val;
+        return { _observation(), 0.0, terminated, truncated, _info() };
     }
 
-    const std::shared_ptr<Info> Environment::_info() const {
-        return std::make_shared<Info>();
+    Info* Environment::_info() const {
+        return new Info();
     }
 
-    const std::shared_ptr<Observation> Environment::_observation() const {
-        return std::make_shared<Observation>();
+    Observation* Environment::_observation() const {
+        return new Observation;
     }
 
     void Environment::close() {

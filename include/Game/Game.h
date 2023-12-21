@@ -39,7 +39,7 @@ private:
     void init_player(int player_id, const vec2& starting_location);
     void train(const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game, UnitType unit_type);
     void build(const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game, UnitType unit_type);
-    bool select(std::shared_ptr<Unit> tile, std::shared_ptr<Player> player);
+    bool select(std::shared_ptr<Unit> target_unit, std::shared_ptr<Player> player);
     bool move(std::shared_ptr<Unit> selected_unit, const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game);
     bool attack(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Unit> target_unit, const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game);
     bool gather(std::shared_ptr<Unit> selected_unit, std::shared_ptr<Tile> target_tile, const PlayerInput& input, std::shared_ptr<Player> player, std::shared_ptr<Game> game);

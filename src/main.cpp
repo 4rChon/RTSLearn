@@ -4,23 +4,18 @@ constexpr auto MAX_EPISODES = 1;
 #include <Gym/Environment.h>
 #include <chrono>
 #include <iostream>
+#include <Gym/Test.h>
 
 using namespace Gym;
 
 int main() {
     Environment env({ RenderMode::Human, 16, 2, MAX_STEPS });
-    std::shared_ptr<Observation> obs;
-    std::shared_ptr<Observation> next_obs;
-    double reward;
-    bool terminated;
-    bool truncated;
-    std::shared_ptr<Info> info;
     bool done = false;
 
     auto total_time = 0ll;
     for (int episode = 0; episode < MAX_EPISODES; ++episode)
     {
-        std::tie(obs, info) = env.reset("assets/map.json");
+        auto [obs, info] = env.reset("assets/map.json");
         done = false;
 
         auto start_time = std::chrono::high_resolution_clock::now();
@@ -31,13 +26,19 @@ int main() {
                 env.sample_action(1)
             };
 
-            std::tie(next_obs, reward, terminated, truncated, info) = env.step(actions);
+            auto [next_obs, reward, terminated, truncated, info] = env.step(actions);
 
             // agent.update(obs, action, reward, terminated, next_obs);
 
             done = terminated || truncated;
+            
+            delete info;
+            delete obs;
             obs = next_obs;
         }
+
+        delete obs;
+
         auto end_time = std::chrono::high_resolution_clock::now();
         total_time += std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
 

@@ -13,10 +13,8 @@ namespace Pathfinder {
         std::unordered_map<vec2, bool> open_set{ {start, true } };
         std::unordered_map<vec2, vec2> came_from;
         std::vector<std::vector<unsigned short>> g_score = std::vector<std::vector<unsigned short>>(map_width, std::vector<unsigned short>(map_height, std::numeric_limits<unsigned short>::max()));
-        std::vector<std::vector<unsigned short>> f_score = std::vector<std::vector<unsigned short>>(map_width, std::vector<unsigned short>(map_height, std::numeric_limits<unsigned short>::max()));
 
         g_score[start.first][start.second] = 0;
-        g_score[start.first][start.second] = heuristic(start, end);
         
         came_from.reserve(map_width * map_height);
         open_set.reserve(map_width * map_height);
@@ -57,14 +55,13 @@ namespace Pathfinder {
                 if (tentative_g_score >= g_score[x_n][y_n]) {
                     continue;
                 }
+                g_score[x_n][y_n] = tentative_g_score;
 
                 came_from[neighbour] = current;
-                g_score[x_n][y_n] = tentative_g_score;
-                f_score[x_n][y_n] = tentative_g_score + heuristic(neighbour, end);
                 if (open_set[neighbour]) {
                     continue;
                 }
-                open_pq.push({ f_score[x_n][y_n], neighbour});
+                open_pq.push({ tentative_g_score + heuristic(neighbour, end), neighbour});
                 open_set[neighbour] = true;
             }
         }

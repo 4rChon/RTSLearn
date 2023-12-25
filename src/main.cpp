@@ -4,7 +4,6 @@ constexpr auto MAX_EPISODES = 1;
 #include <Gym/Environment.h>
 #include <chrono>
 #include <iostream>
-#include <Gym/Test.h>
 
 using namespace Gym;
 

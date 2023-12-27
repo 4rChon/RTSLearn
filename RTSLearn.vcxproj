@@ -135,7 +135,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Game\Renderer.cpp" />
+    <ClCompile Include="src\Game\Renderer\RenderBuffer.cpp" />
+    <ClCompile Include="src\Game\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Game\Actions\Attack.cpp" />
     <ClCompile Include="src\Game\Actions\Build.cpp" />
     <ClCompile Include="src\Game\Actions\Gather.cpp" />
@@ -168,7 +169,8 @@
     <ClInclude Include="include\Game\Actions\Action.h" />
     <ClInclude Include="include\Game\Game.h" />
     <ClInclude Include="include\Game\Pathfinder.h" />
-    <ClInclude Include="include\Game\Renderer.h" />
+    <ClInclude Include="include\Game\Renderer\RenderBuffer.h" />
+    <ClInclude Include="include\Game\Renderer\Renderer.h" />
     <ClInclude Include="include\Game\ResourceLoader.h" />
     <ClInclude Include="include\Game\Unit.h" />
     <ClInclude Include="include\Game\UnitAction.h" />

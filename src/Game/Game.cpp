@@ -10,7 +10,7 @@
 #include <Game/Actions/Move.h>
 #include <Game/Actions/Gather.h>
 #include <Game/Actions/Build.h>
-#include <Game/Renderer.h>
+#include <Game/Renderer/Renderer.h>
 #include <TypeDefs.h>
 #include <memory>
 #include <string>
@@ -99,13 +99,17 @@ void Game::step() {
         }
     }
 
-    for (auto& unit_kv : units) {
+    for (const auto& unit_kv : units) {
         unit_kv.second->act();
     }
 
-    for (auto& unit_kv : units) {
-        if (!unit_kv.second->is_alive()) {
-            destroy_unit(unit_kv.second);
+    for (auto it = units.begin(); it != units.end();) {
+        if (!it->second->is_alive()) {
+            destroy_unit(it->second);
+            it = units.erase(it);
+        }
+        else {
+            ++it;
         }
     }
 
@@ -233,7 +237,7 @@ void Game::create_unit(UnitType unit_type, const vec2& position, int player_id) 
     auto sight_range = Constants::unit_sight_range.at(unit_type);
     auto& unit_position = unit->get_position();
 
-    auto map_size = map->get_size();
+    auto& map_size = map->get_size();
     for (auto x = max(0, unit_position.first - sight_range); x <= min(map_size.first - 1, unit_position.first + sight_range); ++x) {
         for (auto y = max(0, unit_position.second - sight_range); y <= min(map_size.second - 1, unit_position.second + sight_range); ++y) {
             auto pos = std::make_pair(x, y);
@@ -249,7 +253,7 @@ void Game::destroy_unit(const std::shared_ptr<Unit>& unit) {
     auto sight_range = Constants::unit_sight_range.at(unit_type);
     auto& unit_position = unit->get_position();
 
-    auto map_size = map->get_size();
+    auto& map_size = map->get_size();
     for (auto x = max(0, unit_position.first - sight_range); x <= min(map_size.first - 1, unit_position.first + sight_range); ++x) {
         for (auto y = max(0, unit_position.second - sight_range); y <= min(map_size.second - 1, unit_position.second + sight_range); ++y) {
             auto pos = std::make_pair(x, y);
@@ -259,11 +263,8 @@ void Game::destroy_unit(const std::shared_ptr<Unit>& unit) {
         }
     }
 
-    units.erase(unit->get_id());
-    map->get_tile(unit->get_position()).lock()->unset_unit();
-
-    players[unit->get_owner()]->modify_supply(-Constants::unit_supply_cost.at(unit_type));
-    players[unit->get_owner()]->modify_max_supply(-Constants::unit_supply_provided.at(unit_type));
+    players[player_id]->modify_supply(-Constants::unit_supply_cost.at(unit_type));
+    players[player_id]->modify_max_supply(-Constants::unit_supply_provided.at(unit_type));
 }
 
 std::weak_ptr<Tile> Game::get_nearest_pathable_tile(const vec2& position) {

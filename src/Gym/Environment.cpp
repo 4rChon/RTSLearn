@@ -20,11 +20,11 @@ namespace Gym {
     std::tuple<Observation*, Info*> Environment::reset(const std::string& map_name, unsigned int seed) {
         if (seed == 0) {
             this->seed = rd();
-        }
-        else {
+        } else {
             this->seed = seed;
         }
 
+        done = false;
         gen = std::mt19937(this->seed);
         tick = 0;
 
@@ -46,7 +46,7 @@ namespace Gym {
         return { _observation(), _info() };
     }
 
-    std::tuple<Observation*, double, bool, bool, Info*> Environment::step(std::vector<PlayerInput>& actions) {
+    std::tuple<Observation*, double, bool, bool, Info*> Environment::step(const std::vector<PlayerInput>& actions) {
         for (const PlayerInput& player_action : actions) {
             game->buffer_action(player_action);
         }
@@ -68,7 +68,7 @@ namespace Gym {
     }
 
     Observation* Environment::_observation() const {
-        return new Observation;
+        return new Observation();
     }
 
     void Environment::close() {
@@ -80,10 +80,6 @@ namespace Gym {
 
     void Environment::render() const {
         game->render();
-    }
-
-    std::mt19937 Environment::get_generator() const {
-        return gen;
     }
 
     const std::pair<double, double>& Environment::get_reward_range() const {

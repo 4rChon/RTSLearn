@@ -17,10 +17,9 @@ namespace Gym {
     public:
         Environment(const Metadata& metadata);
         std::tuple<Observation*, Info*> reset(const std::string& map_name, unsigned int seed = 0);
-        std::tuple<Observation*, double, bool, bool, Info*> step(std::vector<PlayerInput>& action);
+        std::tuple<Observation*, double, bool, bool, Info*> step(const std::vector<PlayerInput>& action);
         void close();
         void render() const;
-        std::mt19937 get_generator() const;
         const std::pair<double, double>& get_reward_range() const;
         const PlayerInput sample_action(int player_id);
     private:

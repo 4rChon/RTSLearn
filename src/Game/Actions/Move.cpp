@@ -1,48 +1,53 @@
 #include <Game/Actions/Move.h>
 #include <Game/Pathfinder.h>
 
-Move::Move(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
+bool Move::can_act(const Unit* selected_unit, const Tile* target_tile) {
+    return selected_unit
+        && Constants::unit_abilities.at(selected_unit->get_type()).contains(AbilityType::Move)
+        && target_tile
+        && target_tile->is_pathable();
+}
+
+Move::Move(const vec2& target, Unit& actor, Player& player, Game& game)
     : Action(target, actor, player, game, 'm')
     , move_cooldown(0)
     , path_index(0) { }
 
 ActionResult Move::act() {
-    auto unit = actor.lock();
-    if (!unit) {
+    if (!actor) {
         return ActionResult::Failure;
     }
 
-    if (unit->get_position() == target) {
+    if (actor->get_position() == target) {
         return ActionResult::Success;
     }
 
     ++move_cooldown;
-    if (move_cooldown < Constants::unit_move_cooldown.at(unit->get_type())) {
+    if (move_cooldown < Constants::unit_move_cooldown.at(actor->get_type())) {
         return ActionResult::Running;
     } else {
         move_cooldown = 0;
     }
 
-    auto game = this->game.lock();
     if (!game) {
         return ActionResult::Failure;
     }
 
-    auto map = game->get_map().lock();
+    auto map = game->get_map();
     if (!map) {
         return ActionResult::Failure;
     }
 
     if (path_index == 0) {
         auto pathable_map = map->get_pathable_map();
-        Pathfinder::get_path(unit->get_position(), target, pathable_map, path);
+        Pathfinder::get_path(actor->get_position(), target, pathable_map, path);
     }
 
     if (path.size() == 0) {
         return ActionResult::Failure;
     }
 
-    if (!game->move_unit(unit, path[path.size() - (2 + path_index++)])) {
+    if (!game->move_unit(*actor, path[path.size() - (2 + path_index++)])) {
         path_index = 0;
     }
 

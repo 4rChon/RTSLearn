@@ -1,35 +1,40 @@
 #include <Game/Actions/Attack.h>
 
-Attack::Attack(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
+bool Attack::can_act(const Unit* selected_unit, const Unit* target_unit, int player_id) {
+    return selected_unit
+        && target_unit
+        && target_unit->get_owner() != player_id
+        && Constants::unit_abilities.at(selected_unit->get_type()).contains(AbilityType::Attack);
+}
+
+Attack::Attack(const vec2& target, Unit& actor, Player& player, Game& game)
     : Action(target, actor, player, game, 'a')
     , attack_cooldown(0) {
-    target_unit = game.lock()->get_map().lock()->get_tile(target).lock()->get_unit();
+    target_unit = game.get_map()->get_tile(target)->get_unit();
 }
 
 ActionResult Attack::act() {
-    auto unit = actor.lock();
-    if (!unit) {
+    if (!actor) {
         return ActionResult::Failure;
     }
 
-    auto target_unit = this->target_unit.lock();
     if (!target_unit || !target_unit->is_alive()) {
         return ActionResult::Success;
     }
 
-    auto range = Constants::unit_attack_range.at(unit->get_type());
-    auto& position = unit->get_position();
+    auto range = Constants::unit_attack_range.at(actor->get_type());
+    auto& position = actor->get_position();
     auto& target_position = target_unit->get_position();
     auto man_dist = std::abs(target_position.first - position.first) + std::abs(target_position.second - position.second);
 
-    auto map = game.lock()->get_map().lock();
+    auto map = game->get_map();
     if (!map) {
         return ActionResult::Failure;
     }
 
     if (man_dist > range || !map->has_line_of_sight(position, target_position)) {
         if (!move_action) {
-            move_action = std::make_unique<Move>(target_position, actor, player, game);
+            move_action = std::make_unique<Move>(target_position, *actor, *player, *game);
         }
         auto move_result = move_action->act();
         if (move_result != ActionResult::Success) {
@@ -38,13 +43,13 @@ ActionResult Attack::act() {
     }
 
     ++attack_cooldown;
-    if (attack_cooldown < Constants::unit_attack_cooldown.at(unit->get_type())) {
+    if (attack_cooldown < Constants::unit_attack_cooldown.at(actor->get_type())) {
         return ActionResult::Running;
     } else {
         attack_cooldown = 0;
     }
 
-    auto is_alive = target_unit->modify_health(-Constants::unit_attack.at(unit->get_type()));
+    auto is_alive = target_unit->modify_health(-Constants::unit_attack.at(actor->get_type()));
     if (!is_alive) {
         return ActionResult::Success;
     }
@@ -57,5 +62,5 @@ void Attack::cancel() {
         move_action->cancel();
     }
 
-    target_unit.reset();
+    target_unit = nullptr;
 }

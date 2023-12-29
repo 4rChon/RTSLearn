@@ -1,7 +1,12 @@
 #include <Game/Actions/Build.h>
 #include <Game/Constants.h>
 
-Build::Build(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, UnitType unit_type)
+bool Build::can_act(const Unit* selected_unit, ActionType action_type) {
+    return selected_unit
+        && Constants::unit_abilities.at(selected_unit->get_type()).contains((AbilityType)action_type);
+}
+
+Build::Build(const vec2& target, Unit& actor, Player& player, Game& game, UnitType unit_type)
     : Action(target, actor, player, game, Constants::unit_create_sprite.at(unit_type))
     , unit_type(unit_type)
     , started(false)
@@ -10,12 +15,10 @@ Build::Build(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player
 }
 
 ActionResult Build::act() {
-    auto unit = actor.lock();
-    if (!unit) {
+    if (!actor) {
         return ActionResult::Failure;
     }
 
-    auto player = this->player.lock();
     if (!player) {
         return ActionResult::Failure;
     }
@@ -32,9 +35,9 @@ ActionResult Build::act() {
         player->modify_minerals(-mineral_cost);
     }
 
-    if (unit->get_position() != target) {
+    if (actor->get_position() != target) {
         if (!move_action) {
-            move_action = std::make_unique<Move>(target, actor, player, game);
+            move_action = std::make_unique<Move>(target, *actor, *player, *game);
         }
 
         auto move_result = move_action->act();
@@ -48,16 +51,15 @@ ActionResult Build::act() {
         return ActionResult::Running;
     }
 
-    auto game = this->game.lock();
     if (!game) {
         return ActionResult::Failure;
     }
 
-    auto nearest_pathable_tile = game->get_nearest_pathable_tile(target).lock();
+    auto nearest_pathable_tile = game->get_map()->get_nearest_pathable_tile(target);
     if (!nearest_pathable_tile) {
         return ActionResult::Running;
     }
-    game->move_unit(unit, nearest_pathable_tile->get_position());
+    game->move_unit(*actor, nearest_pathable_tile->get_position());
     game->create_unit(unit_type, target, player->get_id());
 
     return ActionResult::Success;
@@ -69,7 +71,6 @@ void Build::cancel() {
     }
 
     if (started) {
-        auto player = this->player.lock();
         player->modify_minerals(Constants::unit_mineral_cost.at(unit_type));
     }
 

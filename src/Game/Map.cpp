@@ -2,7 +2,6 @@
 #include <Game/Constants.h>
 #include <Game/ResourceLoader.h>
 #include <TypeDefs.h>
-#include <fstream>
 #include <memory>
 
 Map::Map(const std::string map_name) {
@@ -13,7 +12,7 @@ Map::Map(const std::string map_name) {
     int players = j["players"];
 
     size = { width, height };
-    tilemap.resize(height, std::vector<std::shared_ptr<Tile>>(width));
+    tilemap.resize(width * height);
 
     starting_locations.reserve(players);
 
@@ -22,8 +21,8 @@ Map::Map(const std::string map_name) {
         std::string line = j["tiles"][y];
         for (auto x = 0; x < width; ++x) {
             auto letter = line[x];
-            auto tile = std::make_shared<Tile>(vec2{ x, y }, Constants::tile_letter.at(letter));
-            set_tile({ x, y }, tile);
+            auto tile = std::make_unique<Tile>(vec2{ x, y }, Constants::tile_letter.at(letter));
+            set_tile({ x, y }, std::move(tile));
             if (letter == 'O') {
                 starting_locations.push_back({ x, y });
             }
@@ -45,12 +44,12 @@ Map::Map(const std::string map_name) {
     pathable_map.resize(width, std::vector<bool>(height));
 }
 
-void Map::set_tile(const vec2& pos, std::shared_ptr<Tile> tile) {
-    tilemap[pos.second][pos.first] = tile;
+void Map::set_tile(const vec2& pos, std::unique_ptr<Tile> tile) {
+    tilemap[pos.first + pos.second * size.first] = std::move(tile);
 }
 
-std::weak_ptr<Tile> Map::get_tile(const vec2& pos) const {
-    return tilemap[pos.second][pos.first];
+Tile* Map::get_tile(const vec2& pos) const {
+    return tilemap[pos.first + pos.second * size.first].get();
 }
 
 const vec2& Map::get_size() const {
@@ -62,9 +61,9 @@ bool Map::has_line_of_sight(const vec2& start, const vec2& end) const {
 }
 
 std::vector<std::vector<bool>> Map::get_pathable_map() {
-    for (int y = 0; y < size.second; ++y) {
-        for (int x = 0; x < size.first; ++x) {
-            pathable_map[x][y] = tilemap[y][x]->is_pathable();
+    for (int x = 0; x < size.first; ++x) {
+        for (int y = 0; y < size.second; ++y) {
+            pathable_map[x][y] = tilemap[x + y * size.second]->is_pathable();
         }
     }
 
@@ -84,7 +83,7 @@ bool Map::cast_sight_line(const vec2& start, const vec2& end) const {
     auto err = dx + dy;
 
     while (true) {
-        if (tilemap[y0][x0]->is_vision_blocker()) {
+        if (tilemap[x0 + y0 * size.first]->is_vision_blocker()) {
             return false;
         }
 
@@ -113,4 +112,54 @@ bool Map::cast_sight_line(const vec2& start, const vec2& end) const {
 
 std::vector<vec2> Map::get_starting_locations() const {
     return starting_locations;
+}
+
+Tile* Map::get_nearest_pathable_tile(const vec2& pos) {
+    auto& [x, y] = pos;
+    auto& tile = tilemap[x + y * size.first];
+    if (tile->is_pathable()) {
+        return tile.get();
+    }
+
+    auto& tile_right = tilemap[x + 1 + y * size.first];
+    if (tile_right->is_pathable()) {
+        return tile_right.get();
+    }
+
+    auto& tile_left = tilemap[x - 1 + y * size.first];
+    if (tile_left->is_pathable()) {
+        return tile_left.get();
+    }
+
+    auto& tile_down = tilemap[x + (y + 1) * size.first];
+    if (tile_down->is_pathable()) {
+        return tile_down.get();
+    }
+
+    auto& tile_up = tilemap[x + (y - 1) * size.first];
+    if (tile_up->is_pathable()) {
+        return tile_up.get();
+    }
+
+    auto& tile_down_right = tilemap[x + 1 + (y + 1) * size.first];
+    if (tile_down_right->is_pathable()) {
+        return tile_down_right.get();
+    }
+
+    auto& tile_up_right = tilemap[x + 1 + (y - 1) * size.first];
+    if (tile_up_right->is_pathable()) {
+        return tile_up_right.get();
+    }
+
+    auto& tile_down_left = tilemap[x - 1 + (y + 1) * size.first];
+    if (tile_down_left->is_pathable()) {
+        return tile_down_left.get();
+    }
+
+    auto& tile_up_left = tilemap[x - 1 + (y - 1) & size.first];
+    if (tile_up_left->is_pathable()) {
+        return tile_up_left.get();
+    }
+
+    return nullptr;
 }

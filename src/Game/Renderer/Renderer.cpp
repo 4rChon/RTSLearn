@@ -23,8 +23,8 @@ namespace Renderer {
         for (auto y = 0; y < y_max; ++y) {
             for (auto x = 0; x < x_max; ++x) {
                 if (players[0]->get_vision({ x, y })) {
-                    auto tile_ptr = map->get_tile({ x, y }).lock();
-                    buffers[buffer_index].append_line(tile_ptr->get_sprite());
+                    auto tile = map->get_tile({ x, y });
+                    buffers[buffer_index].append_line(tile->get_sprite());
                 } else {
                     buffers[buffer_index].append_line("\x1b[40m  ");
                 }

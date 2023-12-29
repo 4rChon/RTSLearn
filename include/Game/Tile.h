@@ -17,13 +17,13 @@ public:
     bool is_vision_blocker() const;
     int get_minerals() const;
     const vec2& get_position() const;
-    std::weak_ptr<Unit> get_unit() const;
+    Unit* get_unit() const;
     std::string get_sprite() const;
 
     void set_minerals(int minerals);
     void set_pathable(bool pathable);
     void set_type(TileType type);
-    void set_unit(std::weak_ptr<Unit> unit);
+    void set_unit(Unit& unit);
     void unset_unit();
 
 private:
@@ -32,5 +32,5 @@ private:
     bool blocks_vision;
     int minerals;
     const vec2 position;
-    std::weak_ptr<Unit> unit;
+    Unit* unit;
 };

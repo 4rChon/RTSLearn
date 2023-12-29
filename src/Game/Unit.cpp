@@ -56,9 +56,9 @@ void Unit::enqueue_action(std::unique_ptr<Action> player_input, bool replace_cur
     action_queue.push(std::move(player_input));
 }
 
-void Unit::act() {
+ActionResult Unit::act() {
     if (action_queue.empty()) {
-        return;
+        return ActionResult::None;
     }
 
     auto& action = action_queue.front();
@@ -80,6 +80,8 @@ void Unit::act() {
             break;
         }
     }
+
+    return result;
 }
 
 std::vector<ActionType> Unit::get_available_actions() const {

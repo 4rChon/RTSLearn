@@ -87,7 +87,7 @@ namespace Gym {
     }
 
     const PlayerInput Environment::sample_action(int player_id) {
-        auto& map_size = game->get_map().lock()->get_size();
+        auto& map_size = game->get_map()->get_size();
 
         auto available_actions = game->get_available_actions(player_id);
         std::uniform_int_distribution<> dis(0, available_actions.size()-1);

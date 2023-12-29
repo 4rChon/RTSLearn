@@ -3,9 +3,12 @@
 #include <string>
 #include <TypeDefs.h>
 
+class Unit;
+class Map;
+
 class Player {
 public:
-    Player(int id);
+    Player(int id, const vec2& map_size);
     int get_id() const;
     int get_minerals() const;
     int get_free_supply() const;
@@ -16,7 +19,7 @@ public:
     void deselect_unit();
     int get_selected_unit_id() const;
     const std::string get_resources_string() const;
-    void modify_vision(const vec2& position, int value);
+    void modify_vision(const Unit& unit, const Map& map, int value);
     bool get_vision(const vec2& position);
 private:
     const int id;
@@ -24,5 +27,5 @@ private:
     int max_supply;
     int supply;
     int selected_unit_id;
-    std::unordered_map<vec2, int> vision;
+    std::vector<std::vector<int>> vision;
 };

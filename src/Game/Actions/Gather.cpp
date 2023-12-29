@@ -1,26 +1,32 @@
 #include <Game/Actions/Gather.h>
 #include <Game/Actions/Move.h>
 
-Gather::Gather(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game)
+bool Gather::can_act(const Unit* selected_unit, const Tile* target_tile) {
+    return selected_unit
+        && Constants::unit_abilities.at(selected_unit->get_type()).contains(AbilityType::Gather)
+        && target_tile
+        && target_tile->get_type() == TileType::Mine;
+}
+
+Gather::Gather(const vec2& target, Unit& actor, Player& player, Game& game)
     : Action(target, actor, player, game, 'g')
     , target_progress(5)
     , progress(0) {
 }
 
 ActionResult Gather::act() {
-    auto unit = actor.lock();
-    if (!unit) {
+    if (!actor) {
         return ActionResult::Failure;
     }
 
-    auto tile = game.lock()->get_map().lock()->get_tile(target).lock();
+    auto tile = game->get_map()->get_tile(target);
     if (tile->get_type() != TileType::Mine || tile->get_minerals() <= 0) {
         return ActionResult::Failure;
     }
 
-    if (unit->get_position() != target) {
+    if (actor->get_position() != target) {
         if (!move_action) {
-            move_action = std::make_unique<Move>(target, actor, player, game);
+            move_action = std::make_unique<Move>(target, *actor, *player, *game);
         }
 
         auto move_result = move_action->act();
@@ -34,12 +40,12 @@ ActionResult Gather::act() {
         return ActionResult::Running;
     }
 
-    if (auto player = this->player.lock()) {
+    if (player) {
         player->modify_minerals(10);
         progress = 0;
         tile->set_minerals(tile->get_minerals() - 10);
 
-        unit->enqueue_action(std::make_unique<Gather>(target, actor, player, game), false);
+        actor->enqueue_action(std::make_unique<Gather>(target, *actor, *player, *game), false);
         return ActionResult::Success;
     }
 

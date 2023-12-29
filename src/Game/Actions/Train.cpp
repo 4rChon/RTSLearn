@@ -1,7 +1,12 @@
 #include <Game/Actions/Train.h>
 #include <Game/Constants.h>
 
-Train::Train(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, UnitType unit_type)
+bool Train::can_act(const Unit* selected_unit, ActionType action_type) {
+    return selected_unit
+        && Constants::unit_abilities.at(selected_unit->get_type()).contains((AbilityType)action_type);
+}
+
+Train::Train(const vec2& target, Unit& actor, Player& player, Game& game, UnitType unit_type)
     : Action(target, actor, player, game, Constants::unit_create_sprite.at(unit_type))
     , unit_type(unit_type)
     , progress(0)
@@ -9,12 +14,10 @@ Train::Train(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player
 }
 
 ActionResult Train::act() {
-    auto unit = actor.lock();
-    if (!unit) {
+    if (!actor) {
         return ActionResult::Failure;
     }
 
-    auto player = this->player.lock();
     if (!player) {
         return ActionResult::Failure;
     }
@@ -42,13 +45,12 @@ ActionResult Train::act() {
         return ActionResult::Running;
     }
 
-    auto game = this->game.lock();
     if (!game) {
         return ActionResult::Failure;
     }
 
-    auto& position = this->actor.lock()->get_position();
-    auto nearest_pathable_tile = game->get_nearest_pathable_tile(position).lock();
+    auto& position = actor->get_position();
+    auto nearest_pathable_tile = game->get_map()->get_nearest_pathable_tile(position);
     if (!nearest_pathable_tile) {
         return ActionResult::Running;
     }
@@ -60,7 +62,6 @@ ActionResult Train::act() {
 }
 
 void Train::cancel() {
-    auto player = this->player.lock();
     if (progress > 0) {
         player->modify_minerals(Constants::unit_mineral_cost.at(unit_type));
         player->modify_supply(-Constants::unit_supply_cost.at(unit_type));

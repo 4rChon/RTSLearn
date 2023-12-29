@@ -9,11 +9,12 @@
 
 class Attack : public Action {
 public:
-    Attack(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game);
+    static bool can_act(const Unit* selected_unit, const Unit* target_unit, int player_id);
+    Attack(const vec2& target, Unit& actor, Player& player, Game& game);
     ActionResult act() override;
     void cancel() override;
 private:
     int attack_cooldown;
-    std::weak_ptr<Unit> target_unit;
+    Unit* target_unit;
     std::unique_ptr<Move> move_action;
 };

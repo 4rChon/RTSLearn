@@ -13,7 +13,7 @@ class Game;
 
 class Action {
 public:
-    Action(const vec2& target, std::weak_ptr<Unit> actor, std::weak_ptr<Player> player, std::weak_ptr<Game> game, char sprite);
+    Action(const vec2& target, Unit& actor, Player& player, Game& game, char sprite);
     virtual ~Action() = default;
     virtual ActionResult act() = 0;
     virtual void cancel() = 0;
@@ -21,7 +21,7 @@ public:
 protected:
     char sprite;
     const vec2 target;
-    std::weak_ptr<Unit> actor;
-    std::weak_ptr<Player> player;
-    std::weak_ptr<Game> game;
+    Unit* actor;
+    Player* player;
+    Game* game;
 };

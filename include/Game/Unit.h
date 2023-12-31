@@ -13,6 +13,7 @@ class Action;
 class Unit {
 public:
     Unit(UnitType type, const vec2& position, int owner);
+    ~Unit();
 
     void set_position(const vec2& position);
 

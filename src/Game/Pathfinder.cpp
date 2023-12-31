@@ -7,6 +7,7 @@ namespace Pathfinder {
     void Pathfinder::get_path(const vec2& start, const vec2& end, const std::vector<std::vector<bool>>& map, std::vector<vec2>& out_path) {
         const unsigned char map_width = map.size();
         const unsigned char map_height = map[0].size();
+
         std::priority_queue<std::pair<unsigned char, vec2>, std::vector<std::pair<unsigned char, vec2>>, std::greater<std::pair<unsigned char, vec2>>> open_pq;
         open_pq.push({ 0, start });
 

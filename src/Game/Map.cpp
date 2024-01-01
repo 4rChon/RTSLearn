@@ -41,7 +41,7 @@ Map::Map(const std::string map_name) {
         }
     }
 
-    pathable_map.resize(width, std::vector<bool>(height));
+    pathable_map.resize(width * height);
 }
 
 void Map::set_tile(const vec2& pos, std::unique_ptr<Tile> tile) {
@@ -60,10 +60,10 @@ bool Map::has_line_of_sight(const vec2& start, const vec2& end) const {
     return line_of_sight_cache[start.first][start.second][end.first][end.second];
 }
 
-std::vector<std::vector<bool>> Map::get_pathable_map() {
+std::vector<bool> Map::get_pathable_map() {
     for (int x = 0; x < size.first; ++x) {
         for (int y = 0; y < size.second; ++y) {
-            pathable_map[x][y] = tilemap[x + y * size.second]->is_pathable();
+            pathable_map[x + y * size.first] = tilemap[x + y * size.first]->is_pathable();
         }
     }
 

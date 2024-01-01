@@ -2,6 +2,9 @@
 #include <Game/ActionType.h>
 #include <Game/PlayerInput.h>
 #include <vector>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 namespace Gym {
     std::vector<PlayerInput> sample_noops(int player_id, int max_steps) {

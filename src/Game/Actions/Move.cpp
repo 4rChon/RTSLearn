@@ -40,7 +40,7 @@ ActionResult Move::act() {
 
     if (path_index == 0) {
         auto pathable_map = map->get_pathable_map();
-        Pathfinder::get_path(actor->get_position(), target, pathable_map, path);
+        Pathfinder::get_path(actor->get_position(), target, pathable_map, map->get_size(), path);
     }
 
     if (path.size() == 0) {

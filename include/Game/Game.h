@@ -14,7 +14,6 @@ class Unit;
 class Action;
 class Player;
 class Map;
-class Tile;
 
 class Game {
 public:
@@ -33,10 +32,10 @@ private:
     std::stack<PlayerInput> input_buffer;
 
     std::vector<std::shared_ptr<Player>> players;
-    std::unordered_map<int, std::unique_ptr<Unit>> units;
-    std::unordered_set<Unit*> acting_units;
+    std::unordered_map<int, std::shared_ptr<Unit>> units;
+    std::unordered_set<std::shared_ptr<Unit>> acting_units;
 
     void destroy_unit(const Unit& unit);
     void init_player(int player_id, const vec2& starting_location);
-    void enqueue_unit_action(Unit& unit, std::unique_ptr<Action> action, bool replace_current_action);
+    void enqueue_unit_action(std::shared_ptr<Unit> unit, std::unique_ptr<Action> action, bool replace_current_action);
 };

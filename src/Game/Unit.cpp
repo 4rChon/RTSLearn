@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <mutex>
+#include <Game/Actions/Noop.h>
 
 int Unit::next_id = 0;
 
@@ -16,7 +17,15 @@ Unit::Unit(UnitType type, const vec2& position, int owner)
     , position(position)
     , owner(owner)
     , id(next_id++)
-    , health(Constants::unit_health.at(type)) {}
+    , health(Constants::unit_health.at(type)) {
+}
+
+Unit::~Unit() {
+    std::lock_guard<std::mutex> guard(action_queue_lock);
+    while (!action_queue.empty()) {
+        action_queue.pop();
+    }
+}
 
 void Unit::set_position(const vec2& position) {
     this->position = position;
@@ -66,13 +75,11 @@ ActionResult Unit::act() {
 
     switch (result) {
         case ActionResult::Success: {
-            std::lock_guard<std::mutex> guard(action_queue_lock);
             action_queue.pop();
             break;
         }
         case ActionResult::Failure: {
             action->cancel();
-            std::lock_guard<std::mutex> guard(action_queue_lock);
             action_queue.pop();
             break;
         }

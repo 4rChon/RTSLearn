@@ -4,28 +4,26 @@
 #include <queue>
 
 namespace Pathfinder {
-    void Pathfinder::get_path(const vec2& start, const vec2& end, const std::vector<std::vector<bool>>& map, std::vector<vec2>& out_path) {
-        const unsigned char map_width = map.size();
-        const unsigned char map_height = map[0].size();
+    void Pathfinder::get_path(const vec2& start, const vec2& end, const std::vector<bool>& map, const vec2& map_size, std::vector<vec2>& out_path) {
+        auto& [map_width, map_height] = map_size;
+
         std::priority_queue<std::pair<unsigned char, vec2>, std::vector<std::pair<unsigned char, vec2>>, std::greater<std::pair<unsigned char, vec2>>> open_pq;
         open_pq.push({ 0, start });
 
-        std::unordered_map<vec2, bool> open_set{ {start, true } };
-        std::unordered_map<vec2, vec2> came_from;
-        std::vector<std::vector<unsigned short>> g_score = std::vector<std::vector<unsigned short>>(map_width, std::vector<unsigned short>(map_height, std::numeric_limits<unsigned short>::max()));
+        auto open_set = std::vector<bool>(map_width * map_height);
+        auto came_from = std::vector<vec2>(map_width * map_height, { -1, -1 });
+        auto g_score = std::vector<unsigned short>(map_width * map_height, std::numeric_limits<unsigned short>::max());
 
-        g_score[start.first][start.second] = 0;
-        
-        came_from.reserve(map_width * map_height);
-        open_set.reserve(map_width * map_height);
+        g_score[start.first + start.second * map_width] = 0;
+        open_set[start.first + start.second * map_width] = true;
 
         while (!open_pq.empty()) {
             auto current = open_pq.top().second;
             if (current == end) {
                 out_path.push_back(current);
 
-                while (came_from.contains(current)) {
-                    current = came_from[current];
+                while (came_from[current.first + current.second * map_width] != vec2{ -1, -1 }) {
+                    current = came_from[current.first + current.second * map_width];
                     out_path.push_back(current);
                 }
 
@@ -33,10 +31,9 @@ namespace Pathfinder {
             }
 
             open_pq.pop();
-            open_set[current] = false;
+            open_set[current.first + current.second * map_width] = false;
 
-            auto x = current.first;
-            auto y = current.second;
+            auto [x, y] = current;
 
             neighbours[0] = { x - 1, y };
             neighbours[1] = { x + 1, y };
@@ -45,24 +42,22 @@ namespace Pathfinder {
 
             for (auto i = 0; i < 4; ++i) {
                 auto& neighbour = neighbours[i];
-                auto x_n = neighbour.first;
-                auto y_n = neighbour.second;
-                if (!map[x_n][y_n]) {
+                auto& [x_n, y_n] = neighbour;
+                if (!map.at(x_n + y_n * map_width)) {
                     continue;
                 }
 
-                auto tentative_g_score = g_score[x][y] + map[x][y];
-                if (tentative_g_score >= g_score[x_n][y_n]) {
+                auto tentative_g_score = g_score.at(x + y * map_width) + map.at(x + y * map_width);
+                if (tentative_g_score >= g_score.at(x_n + y_n * map_width)) {
                     continue;
                 }
-                g_score[x_n][y_n] = tentative_g_score;
+                g_score[x_n + y_n * map_width] = tentative_g_score;
 
-                came_from[neighbour] = current;
-                if (open_set[neighbour]) {
-                    continue;
+                came_from[x_n + y_n * map_width] = current;
+                if (!open_set[x_n + y_n * map_width]) {
+                    open_pq.push({ tentative_g_score + heuristic(neighbour, end), neighbour });
+                    open_set[x_n + y_n * map_width] = true;
                 }
-                open_pq.push({ tentative_g_score + heuristic(neighbour, end), neighbour});
-                open_set[neighbour] = true;
             }
         }
     }

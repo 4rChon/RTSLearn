@@ -10,6 +10,7 @@
 #include <Game/Actions/Move.h>
 #include <Game/Actions/Gather.h>
 #include <Game/Actions/Build.h>
+#include <Game/Pathfinder.h>
 #include <Game/Renderer/Renderer.h>
 #include <TypeDefs.h>
 #include <memory>
@@ -32,7 +33,7 @@ void Game::step() {
 
         auto& player = players[input.player_id];
         auto selected_unit_id = player->get_selected_unit_id();
-        Unit* selected_unit = selected_unit_id < 0 || !units.contains(selected_unit_id) || !units[selected_unit_id]->is_alive() ? nullptr : units[selected_unit_id].get();
+        auto selected_unit = selected_unit_id < 0 || !units.contains(selected_unit_id) || !units[selected_unit_id]->is_alive() ? nullptr : units[selected_unit_id];
         auto target_tile = map->get_tile(input.target);
         auto target_unit = target_tile->get_unit();
 
@@ -46,66 +47,66 @@ void Game::step() {
                     break;
                 }
 
-                if (Attack::can_act(selected_unit, target_unit, input.player_id)) {
+                if (Attack::can_act(selected_unit.get(), target_unit, input.player_id)) {
                     auto action = std::make_unique<Attack>(input.target, *selected_unit, *player, *this);
-                    enqueue_unit_action(*selected_unit, std::move(action), true);
+                    enqueue_unit_action(selected_unit, std::move(action), true);
 
                     break;
                 }
 
-                if (Gather::can_act(selected_unit, target_tile)) {
+                if (Gather::can_act(selected_unit.get(), target_tile)) {
                     auto action = std::make_unique<Gather>(input.target, *selected_unit, *player, *this);
-                    enqueue_unit_action(*selected_unit, std::move(action), true);
+                    enqueue_unit_action(selected_unit, std::move(action), true);
 
                     break;
                 }
 
-                if (Move::can_act(selected_unit, target_tile)) {
+                if (Move::can_act(selected_unit.get(), target_tile)) {
                     auto action = std::make_unique<Move>(input.target, *selected_unit, *player, *this);
-                    enqueue_unit_action(*selected_unit, std::move(action), true);
+                    enqueue_unit_action(selected_unit, std::move(action), true);
                 }
 
                 break;
             }
             case ActionType::TrainWorker: {
-                if (Train::can_act(selected_unit, input.type)) {
+                if (Train::can_act(selected_unit.get(), input.type)) {
                     auto action = std::make_unique<Train>(input.target, *selected_unit, *player, *this, UnitType::Worker);
-                    enqueue_unit_action(*selected_unit, std::move(action), true);
+                    enqueue_unit_action(selected_unit, std::move(action), true);
                 }
                 break;
             }
             case ActionType::TrainMeleeWarrior: {
-                if (Train::can_act(selected_unit, input.type)) {
+                if (Train::can_act(selected_unit.get(), input.type)) {
                     auto action = std::make_unique<Train>(input.target, *selected_unit, *player, *this, UnitType::MeleeWarrior);
-                    enqueue_unit_action(*selected_unit, std::move(action), true);
+                    enqueue_unit_action(selected_unit, std::move(action), true);
                 }
                 break;
             }
             case ActionType::TrainRangedWarrior: {
-                if (Train::can_act(selected_unit, input.type)) {
+                if (Train::can_act(selected_unit.get(), input.type)) {
                     auto action = std::make_unique<Train>(input.target, *selected_unit, *player, *this, UnitType::RangedWarrior);
-                    enqueue_unit_action(*selected_unit, std::move(action), true);
+                    enqueue_unit_action(selected_unit, std::move(action), true);
                 }
                 break;
             }
             case ActionType::BuildFarm: {
-                if (Build::can_act(selected_unit, input.type)) {
+                if (Build::can_act(selected_unit.get(), input.type)) {
                     auto action = std::make_unique<Build>(input.target, *selected_unit, *player, *this, UnitType::Farm);
-                    enqueue_unit_action(*selected_unit, std::move(action), true);
+                    enqueue_unit_action(selected_unit, std::move(action), true);
                 }
                 break;
             }
             case ActionType::BuildBarracks: {
-                if (Build::can_act(selected_unit, input.type)) {
+                if (Build::can_act(selected_unit.get(), input.type)) {
                     auto action = std::make_unique<Build>(input.target, *selected_unit, *player, *this, UnitType::Barracks);
-                    enqueue_unit_action(*selected_unit, std::move(action), true);
+                    enqueue_unit_action(selected_unit, std::move(action), true);
                 }
                 break;
             }
             case ActionType::BuildTownHall: {
-                if (Build::can_act(selected_unit, input.type)) {
+                if (Build::can_act(selected_unit.get(), input.type)) {
                     auto action = std::make_unique<Build>(input.target, *selected_unit, *player, *this, UnitType::TownHall);
-                    enqueue_unit_action(*selected_unit, std::move(action), true);
+                    enqueue_unit_action(selected_unit, std::move(action), true);
                 }
                 break;
             }
@@ -120,8 +121,9 @@ void Game::step() {
     // TODO: Only iterate over units that are currently acting
     // units can enqueue actions within actions, so we need to change some internals
     //for (auto it = acting_units.begin(); it != acting_units.end();) {
-    //    if ((*it)->act() != ActionResult::Running) {
-    //        acting_units.erase(it++);
+    //    auto unit = *it;
+    //    if (!unit->is_alive() || unit->act() != ActionResult::Running) {
+    //        it = acting_units.erase(it);
     //    }
     //    else {
     //        ++it;
@@ -168,13 +170,13 @@ void Game::init_player(int player_id, const vec2& starting_location) {
 void Game::create_unit(UnitType unit_type, const vec2& position, int player_id) {
     auto unit = std::make_unique<Unit>(unit_type, position, player_id);
     auto unit_id = unit->get_id();
-    units.insert({ unit->get_id(), std::move(unit) });
-    auto new_unit = units[unit_id].get();
-    map->get_tile(position)->set_unit(*new_unit);
+    units.insert({ unit_id, std::move(unit) });
+    auto moved_unit = units[unit_id].get();
+    map->get_tile(position)->set_unit(*moved_unit);
     auto& player = players[player_id];
 
     player->modify_max_supply(Constants::unit_supply_provided.at(unit_type));
-    player->modify_vision(*new_unit, *map, 1);
+    player->modify_vision(*moved_unit, *map, 1);
 }
 
 void Game::destroy_unit(const Unit& unit) {
@@ -185,6 +187,8 @@ void Game::destroy_unit(const Unit& unit) {
     player->modify_supply(-Constants::unit_supply_cost.at(unit_type));
     player->modify_max_supply(-Constants::unit_supply_provided.at(unit_type));
     player->modify_vision(unit, *map, -1);
+
+    map->get_tile(unit.get_position())->unset_unit();
 }
 
 std::vector<ActionType> Game::get_available_actions(int player_id) {
@@ -229,7 +233,7 @@ bool Game::move_unit(Unit& unit, const vec2& target) {
     return true;
 }
 
-void Game::enqueue_unit_action(Unit& unit, std::unique_ptr<Action> action, bool replace_current_action) {
-    unit.enqueue_action(std::move(action), replace_current_action);
-    acting_units.insert(&unit);
+void Game::enqueue_unit_action(std::shared_ptr<Unit> unit, std::unique_ptr<Action> action, bool replace_current_action) {
+    unit->enqueue_action(std::move(action), replace_current_action);
+    acting_units.insert(unit);
 }

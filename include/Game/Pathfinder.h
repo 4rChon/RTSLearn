@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace Pathfinder{
-    void get_path(const vec2& start, const vec2& end, const std::vector<std::vector<bool>>& map, std::vector<vec2>& out_path);
+    void get_path(const vec2& start, const vec2& end, const std::vector<bool>& map, const vec2& map_size, std::vector<vec2>& out_path);
 }
 
 namespace {

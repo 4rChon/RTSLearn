@@ -11,7 +11,7 @@ public:
     Map(const std::string map_name);
     
     Tile* get_tile(const vec2& pos) const;
-    Tile* get_nearest_pathable_tile(const vec2& pos) const;
+    Tile* get_adjacent_pathable_tile(const vec2& pos) const;
     const vec2& get_size() const;
     bool has_line_of_sight(const vec2& start, const vec2& end) const;
     std::vector<vec2> get_starting_locations() const;

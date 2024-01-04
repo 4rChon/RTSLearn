@@ -55,7 +55,7 @@ ActionResult Build::act() {
         return ActionResult::Failure;
     }
 
-    auto nearest_pathable_tile = game->get_map()->get_nearest_pathable_tile(target);
+    auto nearest_pathable_tile = game->get_map()->get_adjacent_pathable_tile(target);
     if (!nearest_pathable_tile) {
         return ActionResult::Running;
     }

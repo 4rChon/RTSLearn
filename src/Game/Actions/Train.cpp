@@ -50,7 +50,7 @@ ActionResult Train::act() {
     }
 
     auto& position = actor->get_position();
-    auto nearest_pathable_tile = game->get_map()->get_nearest_pathable_tile(position);
+    auto nearest_pathable_tile = game->get_map()->get_adjacent_pathable_tile(position);
     if (!nearest_pathable_tile) {
         return ActionResult::Running;
     }

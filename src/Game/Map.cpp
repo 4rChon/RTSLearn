@@ -139,7 +139,7 @@ std::vector<vec2> Map::get_starting_locations() const {
     return starting_locations;
 }
 
-Tile* Map::get_nearest_pathable_tile(const vec2& pos) const {
+Tile* Map::get_adjacent_pathable_tile(const vec2& pos) const {
     for (const auto& neighbour : get_adjacent_tiles(pos)) {
         if (neighbour != nullptr && neighbour->is_pathable()) {
             return neighbour;

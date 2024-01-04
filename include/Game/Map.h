@@ -20,7 +20,6 @@ private:
     std::vector<vec2> starting_locations;
     vec2 size;
     std::vector<std::unique_ptr<Tile>> tilemap;
-    std::vector<bool> pathable_map;
     std::vector<std::vector<bool>> line_of_sight_cache;
     std::vector<std::array<Tile*, 4>> adjacent_tiles_cache;
 

@@ -41,8 +41,6 @@ Map::Map(const std::string map_name) {
         }
     }
 
-    pathable_map.resize(width * height);
-
     adjacent_tiles_cache.resize(width * height);
     for (auto y = 0; y < height; ++y) {
         for (auto x = 0; x < width; ++x) {

@@ -8,8 +8,8 @@
 
 // TODO: Move most of this stuff to a json file to prevent having to recompile the entire project on changes
 namespace Constants {
-    static const int INITIAL_TILE_MINERALS = 1000;
-    static const int INITIAL_PLAYER_MINERALS = 100;
+    constexpr int INITIAL_TILE_MINERALS = 1000;
+    constexpr int INITIAL_PLAYER_MINERALS = 100;
 
     static const std::unordered_map<UnitType, std::unordered_set<AbilityType>> unit_abilities = {
         { UnitType::Worker, {

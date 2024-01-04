@@ -1,6 +1,11 @@
 #pragma once
 #include <Game/Actions/Action.h>
 #include <Game/Actions/Move.h>
+#include <Game/Actions/ActionResult.h>
+#include <Game/Unit.h>
+#include <Game/Player.h>
+#include <Game/Game.h>
+#include <TypeDefs.h>
 #include <memory>
 
 class Gather : public Action {

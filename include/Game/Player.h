@@ -1,7 +1,7 @@
 #pragma once
-#include <memory>
-#include <string>
 #include <TypeDefs.h>
+#include <string>
+#include <vector>
 
 class Unit;
 class Map;

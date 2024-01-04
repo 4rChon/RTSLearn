@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <chrono>
 
 namespace Renderer {
     static RenderBuffer buffers[2];

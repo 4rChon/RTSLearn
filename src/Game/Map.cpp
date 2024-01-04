@@ -30,22 +30,59 @@ Map::Map(const std::string map_name) {
     }
 
     // initialize line of sight cache
-    line_of_sight_cache.resize(width, std::vector<std::vector<std::vector<bool>>>(height, std::vector<std::vector<bool>>(width, std::vector<bool>(height))));
+    line_of_sight_cache.resize(width * height, std::vector<bool>(width * height));
     for (auto y = 0; y < height; ++y) {
         for (auto x = 0; x < width; ++x) {
             for (auto y2 = 0; y2 < height; ++y2) {
                 for (auto x2 = 0; x2 < width; ++x2) {
-                    line_of_sight_cache[x][y][x2][y2] = cast_sight_line({ x, y }, { x2, y2 });
+                    line_of_sight_cache[x + y * width][x2 + y2 * width] = cast_sight_line({ x, y }, { x2, y2 });
                 }
             }
         }
     }
 
     pathable_map.resize(width * height);
+
+    adjacent_tiles_cache.resize(width * height);
+    for (auto y = 0; y < height; ++y) {
+        for (auto x = 0; x < width; ++x) {
+            auto& adjacent_tiles = adjacent_tiles_cache[x + y * width];
+            if (x > 0) {
+                adjacent_tiles[0] = tilemap[x - 1 + y * width].get();
+            } else {
+                adjacent_tiles[0] = nullptr;
+            }
+
+            if (y > 0) {
+                adjacent_tiles[1] = tilemap[x + (y - 1) * width].get();
+            }
+            else {
+                adjacent_tiles[1] = nullptr;
+            }
+
+            if (x < width - 1) {
+                adjacent_tiles[2] = tilemap[x + 1 + y * width].get();
+            }
+            else {
+                adjacent_tiles[2] = nullptr;
+            }
+
+            if (y < height - 1) {
+                adjacent_tiles[3] = tilemap[x + (y + 1) * width].get();
+            }
+            else {
+                adjacent_tiles[3] = nullptr;
+            }
+        }
+    }
 }
 
 void Map::set_tile(const vec2& pos, std::unique_ptr<Tile> tile) {
     tilemap[pos.first + pos.second * size.first] = std::move(tile);
+}
+
+std::array<Tile*, 4> Map::get_adjacent_tiles(const vec2& pos) const {
+    return adjacent_tiles_cache[pos.first + pos.second * size.first];
 }
 
 Tile* Map::get_tile(const vec2& pos) const {
@@ -57,24 +94,12 @@ const vec2& Map::get_size() const {
 }
 
 bool Map::has_line_of_sight(const vec2& start, const vec2& end) const {
-    return line_of_sight_cache[start.first][start.second][end.first][end.second];
-}
-
-std::vector<bool> Map::get_pathable_map() {
-    for (int x = 0; x < size.first; ++x) {
-        for (int y = 0; y < size.second; ++y) {
-            pathable_map[x + y * size.first] = tilemap[x + y * size.first]->is_pathable();
-        }
-    }
-
-    return pathable_map;
+    return line_of_sight_cache[start.first + start.second * size.first][end.first + end.second * size.first];
 }
 
 bool Map::cast_sight_line(const vec2& start, const vec2& end) const {
-    auto x0 = start.first;
-    auto y0 = start.second;
-    auto x1 = end.first;
-    auto y1 = end.second;
+    auto [x0, y0] = start;
+    auto [x1, y1] = end;
 
     auto dx = abs(x1 - x0);
     auto sx = x0 < x1 ? 1 : -1;
@@ -114,49 +139,49 @@ std::vector<vec2> Map::get_starting_locations() const {
     return starting_locations;
 }
 
-Tile* Map::get_nearest_pathable_tile(const vec2& pos) {
-    auto& [x, y] = pos;
-    auto& tile = tilemap[x + y * size.first];
+Tile* Map::get_nearest_pathable_tile(const vec2& pos) const {
+    const auto [x, y] = pos;
+    const auto& tile = tilemap[x + y * size.first];
     if (tile->is_pathable()) {
         return tile.get();
     }
 
-    auto& tile_right = tilemap[x + 1 + y * size.first];
+    const auto& tile_right = tilemap[x + 1 + y * size.first];
     if (tile_right->is_pathable()) {
         return tile_right.get();
     }
 
-    auto& tile_left = tilemap[x - 1 + y * size.first];
+    const auto& tile_left = tilemap[x - 1 + y * size.first];
     if (tile_left->is_pathable()) {
         return tile_left.get();
     }
 
-    auto& tile_down = tilemap[x + (y + 1) * size.first];
+    const auto& tile_down = tilemap[x + (y + 1) * size.first];
     if (tile_down->is_pathable()) {
         return tile_down.get();
     }
 
-    auto& tile_up = tilemap[x + (y - 1) * size.first];
+    const auto& tile_up = tilemap[x + (y - 1) * size.first];
     if (tile_up->is_pathable()) {
         return tile_up.get();
     }
 
-    auto& tile_down_right = tilemap[x + 1 + (y + 1) * size.first];
+    const auto& tile_down_right = tilemap[x + 1 + (y + 1) * size.first];
     if (tile_down_right->is_pathable()) {
         return tile_down_right.get();
     }
 
-    auto& tile_up_right = tilemap[x + 1 + (y - 1) * size.first];
+    const auto& tile_up_right = tilemap[x + 1 + (y - 1) * size.first];
     if (tile_up_right->is_pathable()) {
         return tile_up_right.get();
     }
 
-    auto& tile_down_left = tilemap[x - 1 + (y + 1) * size.first];
+    const auto& tile_down_left = tilemap[x - 1 + (y + 1) * size.first];
     if (tile_down_left->is_pathable()) {
         return tile_down_left.get();
     }
 
-    auto& tile_up_left = tilemap[x - 1 + (y - 1) & size.first];
+    const auto& tile_up_left = tilemap[x - 1 + (y - 1) & size.first];
     if (tile_up_left->is_pathable()) {
         return tile_up_left.get();
     }

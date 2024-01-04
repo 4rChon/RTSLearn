@@ -28,6 +28,7 @@ public:
     bool move_unit(Unit& unit, const vec2& target);
 private:
     int ticks;
+
     std::shared_ptr<Map> map;
     std::stack<PlayerInput> input_buffer;
 

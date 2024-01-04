@@ -1,5 +1,6 @@
 #include <Game/Actions/Move.h>
 #include <Game/Pathfinder.h>
+#include <Game/Constants.h>
 
 bool Move::can_act(const Unit* selected_unit, const Tile* target_tile) {
     return selected_unit
@@ -39,8 +40,7 @@ ActionResult Move::act() {
     }
 
     if (path_index == 0) {
-        auto pathable_map = map->get_pathable_map();
-        Pathfinder::get_path(actor->get_position(), target, pathable_map, map->get_size(), path);
+        Pathfinder::get_path(actor->get_position(), target, *map, path);
     }
 
     if (path.size() == 0) {

@@ -1,5 +1,5 @@
 #include <Game/Actions/Gather.h>
-#include <Game/Actions/Move.h>
+#include <Game/Constants.h>
 
 bool Gather::can_act(const Unit* selected_unit, const Tile* target_tile) {
     return selected_unit

@@ -1,6 +1,10 @@
 #pragma once
 #include <Game/Actions/Action.h>
 #include <Game/Actions/ActionResult.h>
+#include <Game/Game.h>
+#include <Game/Player.h>
+#include <Game/Unit.h>
+#include <TypeDefs.h>
 
 class Noop : Action {
 public:

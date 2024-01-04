@@ -1,4 +1,5 @@
 #include <Game/Actions/Attack.h>
+#include <Game/Constants.h>
 
 bool Attack::can_act(const Unit* selected_unit, const Unit* target_unit, int player_id) {
     return selected_unit

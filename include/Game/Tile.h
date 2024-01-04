@@ -1,5 +1,4 @@
 #pragma once
-#include <Game/Constants.h>
 #include <Game/TileType.h>
 #include <Game/Unit.h>
 #include <TypeDefs.h>
@@ -27,10 +26,10 @@ public:
     void unset_unit();
 
 private:
+    const vec2 position;
     TileType type;
+    Unit* unit;
+    int minerals;
     bool pathable;
     bool blocks_vision;
-    int minerals;
-    const vec2 position;
-    Unit* unit;
 };

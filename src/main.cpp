@@ -12,6 +12,7 @@ constexpr auto MAX_EPISODES = 1;
 
 using namespace Gym;
 
+#if RUN_REPLAY
 static long long run_replay(Environment& env, const std::vector<std::vector<PlayerInput>>& actions) {
     auto [obs, info] = env.reset("assets/map.json");
     bool done = false;
@@ -36,7 +37,7 @@ static long long run_replay(Environment& env, const std::vector<std::vector<Play
 
     return std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
 }
-
+#else
 static long long run_episode(Environment& env) {
     auto [obs, info] = env.reset("assets/map.json");
     bool done = false;
@@ -81,6 +82,7 @@ static long long run_episode(Environment& env) {
 
     return run_time;
 }
+#endif
 
 int main() {
     Environment env({ RenderMode::Human, 16, 2, MAX_STEPS });

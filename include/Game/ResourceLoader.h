@@ -1,7 +1,7 @@
 #pragma once
+#include <Game/PlayerInput.h>
 #include <nlohmann/json.hpp>
 #include <string>
-#include <Game/PlayerInput.h>
 
 namespace ResourceLoader {
     const nlohmann::json load_json(const std::string& filename);

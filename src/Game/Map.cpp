@@ -140,50 +140,10 @@ std::vector<vec2> Map::get_starting_locations() const {
 }
 
 Tile* Map::get_nearest_pathable_tile(const vec2& pos) const {
-    const auto [x, y] = pos;
-    const auto& tile = tilemap[x + y * size.first];
-    if (tile->is_pathable()) {
-        return tile.get();
-    }
-
-    const auto& tile_right = tilemap[x + 1 + y * size.first];
-    if (tile_right->is_pathable()) {
-        return tile_right.get();
-    }
-
-    const auto& tile_left = tilemap[x - 1 + y * size.first];
-    if (tile_left->is_pathable()) {
-        return tile_left.get();
-    }
-
-    const auto& tile_down = tilemap[x + (y + 1) * size.first];
-    if (tile_down->is_pathable()) {
-        return tile_down.get();
-    }
-
-    const auto& tile_up = tilemap[x + (y - 1) * size.first];
-    if (tile_up->is_pathable()) {
-        return tile_up.get();
-    }
-
-    const auto& tile_down_right = tilemap[x + 1 + (y + 1) * size.first];
-    if (tile_down_right->is_pathable()) {
-        return tile_down_right.get();
-    }
-
-    const auto& tile_up_right = tilemap[x + 1 + (y - 1) * size.first];
-    if (tile_up_right->is_pathable()) {
-        return tile_up_right.get();
-    }
-
-    const auto& tile_down_left = tilemap[x - 1 + (y + 1) * size.first];
-    if (tile_down_left->is_pathable()) {
-        return tile_down_left.get();
-    }
-
-    const auto& tile_up_left = tilemap[x - 1 + (y - 1) & size.first];
-    if (tile_up_left->is_pathable()) {
-        return tile_up_left.get();
+    for (const auto& neighbour : get_adjacent_tiles(pos)) {
+        if (neighbour != nullptr && neighbour->is_pathable()) {
+            return neighbour;
+        }
     }
 
     return nullptr;

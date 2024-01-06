@@ -1,6 +1,6 @@
 #pragma once
 #include <Gym/Observation.h>
-#include <Game/ActionType.h>
+#include <Game/Actions/ActionType.h>
 #include <Game/PlayerInput.h>
 #include <TypeDefs.h>
 #include <utility>

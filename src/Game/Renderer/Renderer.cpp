@@ -5,7 +5,7 @@
 #include <iostream>
 
 namespace Renderer {
-    void init(unsigned short max_fps) {
+    void init(int max_fps) {
         max_delta_time = std::chrono::nanoseconds(1000000000 / max_fps);
         // resize the terminal to 80x100
         std::cout << "\x1b[8;150;150t\x1b[?25l";
@@ -22,7 +22,7 @@ namespace Renderer {
 
         for (auto y = 0; y < y_max; ++y) {
             for (auto x = 0; x < x_max; ++x) {
-                if (players[0]->get_vision({ x, y })) {
+                if (players[0]->has_vision({ x, y })) {
                     auto tile = map->get_tile({ x, y });
                     buffers[buffer_index].append_line(tile->get_sprite());
                 } else {

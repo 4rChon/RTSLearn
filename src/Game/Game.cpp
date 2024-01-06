@@ -16,7 +16,7 @@
 #include <memory>
 #include <string>
 
-Game::Game(unsigned short max_fps) 
+Game::Game(int max_fps) 
     : map(nullptr)
     , ticks(0) {
     Renderer::init(max_fps);
@@ -31,11 +31,11 @@ void Game::step() {
         const PlayerInput& input = input_buffer.top();
         input_buffer.pop();
 
-        auto& player = players[input.player_id];
-        auto selected_unit_id = player->get_selected_unit_id();
-        auto selected_unit = selected_unit_id < 0 || !units.contains(selected_unit_id) || !units[selected_unit_id]->is_alive() ? nullptr : units[selected_unit_id];
-        auto target_tile = map->get_tile(input.target);
-        auto target_unit = target_tile->get_unit();
+        const auto& player = players[input.player_id];
+        const auto selected_unit_id = player->get_selected_unit_id();
+        const auto& selected_unit = selected_unit_id < 0 || !units.contains(selected_unit_id) || !units[selected_unit_id]->is_alive() ? nullptr : units[selected_unit_id];
+        const auto target_tile = map->get_tile(input.target);
+        const auto target_unit = target_tile->get_unit();
 
         switch (input.type) {
             case ActionType::Noop:
@@ -135,7 +135,8 @@ void Game::step() {
             destroy_unit(*it->second);
             it = units.erase(it);
         }
-        else {
+        else
+        {
             ++it;
         }
     }
@@ -149,7 +150,7 @@ void Game::render() {
 
 void Game::load_map(const std::string& map_name) {
     map = std::make_shared<Map>(map_name);
-    auto starting_locations = map->get_starting_locations();
+    const auto& starting_locations = map->get_starting_locations();
     for (auto i = 0; i < starting_locations.size(); ++i) {
         init_player(i, starting_locations[i]);
     }
@@ -160,7 +161,7 @@ Map* Game::get_map() {
 }
 
 void Game::init_player(int player_id, const vec2& starting_location) {
-    auto player = std::make_shared<Player>(player_id, map->get_size());
+    const auto player = std::make_shared<Player>(player_id, map->get_size());
 
     players.push_back(player);
 
@@ -169,20 +170,20 @@ void Game::init_player(int player_id, const vec2& starting_location) {
 
 void Game::create_unit(UnitType unit_type, const vec2& position, int player_id) {
     auto unit = std::make_unique<Unit>(unit_type, position, player_id);
-    auto unit_id = unit->get_id();
+    const auto unit_id = unit->get_id();
     units.insert({ unit_id, std::move(unit) });
-    auto moved_unit = units[unit_id].get();
+    const auto moved_unit = units[unit_id].get();
     map->get_tile(position)->set_unit(*moved_unit);
-    auto& player = players[player_id];
+    const auto& player = players[player_id];
 
     player->modify_max_supply(Constants::unit_supply_provided.at(unit_type));
     player->modify_vision(*moved_unit, *map, 1);
 }
 
 void Game::destroy_unit(const Unit& unit) {
-    auto unit_type = unit.get_type();
-    auto player_id = unit.get_owner();
-    auto& player = players[player_id];
+    const auto unit_type = unit.get_type();
+    const auto player_id = unit.get_owner();
+    const auto& player = players[player_id];
 
     player->modify_supply(-Constants::unit_supply_cost.at(unit_type));
     player->modify_max_supply(-Constants::unit_supply_provided.at(unit_type));
@@ -192,7 +193,7 @@ void Game::destroy_unit(const Unit& unit) {
 }
 
 std::vector<ActionType> Game::get_available_actions(int player_id) {
-    auto selected_unit_id = players[player_id]->get_selected_unit_id();
+    const auto selected_unit_id = players[player_id]->get_selected_unit_id();
     if (selected_unit_id < 0) {
         return { ActionType::Noop, ActionType::Click };
     }
@@ -201,7 +202,7 @@ std::vector<ActionType> Game::get_available_actions(int player_id) {
         return { ActionType::Noop, ActionType::Click };
     }
 
-    auto& unit = units[selected_unit_id];
+    const auto& unit = units[selected_unit_id];
     if (!unit || !unit->is_alive()) {
         return { ActionType::Noop, ActionType::Click };
     }
@@ -210,19 +211,19 @@ std::vector<ActionType> Game::get_available_actions(int player_id) {
 }
 
 bool Game::move_unit(Unit& unit, const vec2& target) {
-    auto tile = map->get_tile(target);
+    const auto tile = map->get_tile(target);
     if (!tile->is_pathable()) {
         return false;
     }
 
-    auto player_id = unit.get_owner();
-    auto& player = players[player_id];
+    const auto player_id = unit.get_owner();
+    const auto& player = players[player_id];
 
     // remove vision from the old location
     player->modify_vision(unit, *map, -1);
 
     // move the unit
-    auto& old_position = unit.get_position();
+    const auto& old_position = unit.get_position();
     map->get_tile(old_position)->unset_unit();
     unit.set_position(target);
     tile->set_unit(unit);
@@ -235,5 +236,5 @@ bool Game::move_unit(Unit& unit, const vec2& target) {
 
 void Game::enqueue_unit_action(std::shared_ptr<Unit> unit, std::unique_ptr<Action> action, bool replace_current_action) {
     unit->enqueue_action(std::move(action), replace_current_action);
-    acting_units.insert(unit);
+    // acting_units.insert(unit);
 }

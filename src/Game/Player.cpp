@@ -69,6 +69,6 @@ void Player::modify_vision(const Unit& unit, const Map& map, int value) {
     }
 }
 
-bool Player::get_vision(const vec2& position) {
+bool Player::has_vision(const vec2& position) const {
     return vision[position.first][position.second];
 }

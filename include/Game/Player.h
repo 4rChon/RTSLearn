@@ -20,7 +20,7 @@ public:
     int get_selected_unit_id() const;
     const std::string get_resources_string() const;
     void modify_vision(const Unit& unit, const Map& map, int value);
-    bool get_vision(const vec2& position);
+    bool has_vision(const vec2& position) const;
 private:
     const int id;
     int minerals;

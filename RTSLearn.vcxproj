@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Game\GameState.cpp" />
     <ClCompile Include="src\Game\Renderer\RenderBuffer.cpp" />
     <ClCompile Include="src\Game\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Game\Actions\Attack.cpp" />
@@ -167,17 +168,16 @@
     <ClInclude Include="include\Game\Actions\Move.h" />
     <ClInclude Include="include\Game\Actions\Noop.h" />
     <ClInclude Include="include\Game\Actions\Train.h" />
-    <ClInclude Include="include\Game\ActionType.h" />
+    <ClInclude Include="include\Game\Actions\ActionType.h" />
     <ClInclude Include="include\Game\Constants.h" />
     <ClInclude Include="include\Game\Actions\Action.h" />
     <ClInclude Include="include\Game\Game.h" />
+    <ClInclude Include="include\Game\GameState.h" />
     <ClInclude Include="include\Game\Pathfinder.h" />
     <ClInclude Include="include\Game\Renderer\RenderBuffer.h" />
     <ClInclude Include="include\Game\Renderer\Renderer.h" />
     <ClInclude Include="include\Game\ResourceLoader.h" />
     <ClInclude Include="include\Game\Unit.h" />
-    <ClInclude Include="include\Game\UnitAction.h" />
-    <ClInclude Include="include\Game\UnitState.h" />
     <ClInclude Include="include\Gym\Agent.h" />
     <ClInclude Include="include\Gym\Environment.h" />
     <ClInclude Include="include\Gym\Info.h" />

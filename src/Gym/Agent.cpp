@@ -1,4 +1,4 @@
-#include <Game/ActionType.h>
+#include <Game/Actions/ActionType.h>
 #include <Game/PlayerInput.h>
 #include <Gym/Agent.h>
 #include <Gym/Observation.h>

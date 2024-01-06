@@ -1,5 +1,5 @@
 #pragma once
-#include <Game/ActionType.h>
+#include <Game/Actions/ActionType.h>
 #include <Game/Game.h>
 #include <Game/PlayerInput.h>
 #include <Gym/Metadata.h>

@@ -17,7 +17,7 @@ class Map;
 
 class Game {
 public:
-    Game(unsigned short max_fps);
+    Game(int max_fps);
     void buffer_action(const PlayerInput& action);
     void step();
     void render();
